@@ -1,0 +1,10 @@
+[package]
+name = "monban-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { workspace = true }
+monban-parser = { path = "../monban-parser/" }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
