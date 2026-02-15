@@ -1,16 +1,19 @@
 use std::{
     collections::{HashMap, HashSet},
-    fs,
-    path::PathBuf,
+    path::Path,
 };
 
 use lindera::{
-    dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, tokenizer::Tokenizer,
+    dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, token::Token,
+    tokenizer::Tokenizer,
 };
 
 use monban_core::{Config, Lexicon, Word};
 
-use crate::dict::JMDict;
+use crate::{
+    dict::JMDict,
+    input::{EpubTextLoader, PlainTextLoader},
+};
 
 const DETAILS_CATEGORY: usize = 0;
 const DETAILS_SUBCATEGORY1: usize = 1;
@@ -37,9 +40,20 @@ impl Parser {
         }
     }
 
-    pub fn load_text(&self, file: impl Into<PathBuf>) -> Lexicon {
-        let content = fs::read_to_string(file.into()).unwrap();
-        let mut tokens = self.tokenizer.tokenize(&content).unwrap();
+    pub fn load_text(&self, file: impl AsRef<Path>) -> Lexicon {
+        self.parse_content(PlainTextLoader::load(file))
+    }
+
+    pub fn load_epub(&self, file: impl AsRef<Path>) -> Lexicon {
+        self.parse_content(EpubTextLoader::load(file))
+    }
+
+    fn parse_content(&self, content: Vec<String>) -> Lexicon {
+        let mut tokens: Vec<Token> = vec![];
+
+        (0..content.len()).for_each(|i| {
+            tokens.append(&mut self.tokenizer.tokenize(&content[i]).unwrap());
+        });
 
         // 0-3: category, sub cat1, sub cat 2, sub cat 3
         // 4-5: conjugation
