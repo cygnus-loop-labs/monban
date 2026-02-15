@@ -1,4 +1,8 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::PathBuf,
+};
 
 use lindera::{
     dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, tokenizer::Tokenizer,
@@ -33,8 +37,9 @@ impl Parser {
         }
     }
 
-    pub fn load_text(&self, text: &str) -> Lexicon {
-        let mut tokens = self.tokenizer.tokenize(text).unwrap();
+    pub fn load_text(&self, file: impl Into<PathBuf>) -> Lexicon {
+        let content = fs::read_to_string(file.into()).unwrap();
+        let mut tokens = self.tokenizer.tokenize(&content).unwrap();
 
         // 0-3: category, sub cat1, sub cat 2, sub cat 3
         // 4-5: conjugation

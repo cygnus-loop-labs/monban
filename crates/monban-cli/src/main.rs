@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf};
+use std::path::PathBuf;
 
 use clap::Parser as ClapParser;
 use tracing::level_filters::LevelFilter;
@@ -22,9 +22,7 @@ fn main() {
 
     let cli = Cli::parse();
 
-    let content = fs::read_to_string(cli.input).unwrap();
-
-    let mut words = parser.load_text(&content);
+    let mut words = parser.load_text(cli.input);
 
     let decks = config
         .user_decks
