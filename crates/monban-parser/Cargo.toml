@@ -6,4 +6,5 @@ edition = "2024"
 [dependencies]
 lindera = { workspace = true }
 monban-core = { path = "../monban-core/" }
+serde_json = { workspace = true }
 tracing = { workspace = true }

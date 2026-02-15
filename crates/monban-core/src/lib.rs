@@ -1,3 +1,9 @@
+mod deck;
+mod kanji;
 mod lexicon;
+mod word;
 
-pub use lexicon::{Lexicon, Word};
+pub use deck::Deck;
+pub use kanji::Kanji;
+pub use lexicon::Lexicon;
+pub use word::Word;
