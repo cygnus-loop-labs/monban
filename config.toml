@@ -11,6 +11,7 @@ exclude_chars = ["ー", "〜"]
 [parser.filtering.include]
 "名詞" = ["一般", "サ変接続"]
 "動詞" = ["自立"]
+"感動詞" = ["*"]
 
 [user_decks]
 decks = [
