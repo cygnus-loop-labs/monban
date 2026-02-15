@@ -4,6 +4,7 @@ use clap::Parser as ClapParser;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
+use monban_core::{Config, Deck, Lexicon};
 use monban_parser::{Parser, PlainDeckLoader};
 
 #[derive(ClapParser)]
@@ -15,7 +16,9 @@ struct Cli {
 fn main() {
     init_logger();
 
-    let parser = Parser::new();
+    let config = Config::load();
+
+    let parser = Parser::new(&config);
 
     let cli = Cli::parse();
 
@@ -23,13 +26,25 @@ fn main() {
 
     let mut words = parser.load_text(&content);
 
-    let deck = PlainDeckLoader::load("data/kaishi.txt");
+    let decks = config
+        .user_decks
+        .decks
+        .iter()
+        .map(PlainDeckLoader::load)
+        .collect::<Vec<Deck>>();
 
+    check_words(&mut words, &decks);
+}
+
+fn check_words(words: &mut Lexicon, decks: &[Deck]) {
     let mut results: Vec<_> = words.iter_mut().collect();
     results.sort_by_key(|w| std::cmp::Reverse(w.count));
 
     for word in &mut results {
-        deck.check(word);
+        for deck in decks {
+            deck.check(word);
+        }
+
         println!("{:?}", word);
     }
 }

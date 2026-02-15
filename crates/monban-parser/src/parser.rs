@@ -4,7 +4,7 @@ use lindera::{
     dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, tokenizer::Tokenizer,
 };
 
-use monban_core::{Lexicon, Word};
+use monban_core::{Config, Lexicon, Word};
 
 use crate::dict::JMDict;
 
@@ -15,17 +15,21 @@ const DETAILS_BASE: usize = 6;
 pub struct Parser {
     tokenizer: Tokenizer,
     dict: JMDict,
+    include_filter: HashMap<String, HashSet<String>>,
+    exclude_chars: Vec<String>,
 }
 
 impl Parser {
-    pub fn new() -> Self {
-        let ipadic = load_dictionary("embedded://ipadic").unwrap();
+    pub fn new(config: &Config) -> Self {
+        let ipadic = load_dictionary(&config.parser.dictionary).unwrap();
         let mut dict = JMDict::new();
-        dict.load("data/jmdict.json", "data/kanji.json");
+        dict.load(&config.dictionary.words, &config.dictionary.kanji);
 
         Self {
             tokenizer: Tokenizer::new(Segmenter::new(Mode::Normal, ipadic, None)),
             dict,
+            include_filter: config.parser.filtering.include.clone(),
+            exclude_chars: config.parser.filtering.exclude_chars.clone(),
         }
     }
 
@@ -74,18 +78,11 @@ impl Parser {
     }
 
     fn filter(&self, word: &Word) -> bool {
-        let cat_filters = HashMap::from([
-            ("名詞", HashSet::from(["一般", "サ変接続"])),
-            ("動詞", HashSet::from(["自立"])),
-        ]);
-
-        let blacklist = HashSet::from(["ー", "〜"]);
-
         if !word.valid {
             return false;
         }
 
-        if blacklist.contains(&*word.word) {
+        if self.exclude_chars.contains(&word.word) {
             return false;
         }
 
@@ -94,17 +91,11 @@ impl Parser {
             return false;
         }
 
-        if let Some(cat) = cat_filters.get(&*word.cat) {
-            cat.contains(&*word.subcat)
+        if let Some(cat) = self.include_filter.get(&word.cat) {
+            cat.contains(&word.subcat)
         } else {
             tracing::debug!(target: "parser", "Filtering word: {}: {}, {}", &word.word, &word.cat, &word.subcat);
             false
         }
-    }
-}
-
-impl Default for Parser {
-    fn default() -> Self {
-        Self::new()
     }
 }

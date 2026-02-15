@@ -1,0 +1,19 @@
+[dictionary]
+words = "data/jmdict.json"
+kanji = "data/kanji.json"
+
+[parser]
+dictionary = "embedded://ipadic"
+
+[parser.filtering]
+exclude_chars = ["ー", "〜"]
+
+[parser.filtering.include]
+"名詞" = ["一般", "サ変接続"]
+"動詞" = ["自立"]
+
+[user_decks]
+decks = [
+    "data/kaishi.txt"
+]
+
