@@ -18,3 +18,4 @@ exclude_chars = ["ー", "〜"]
 
 [wk_deck]
 deck = "data/wk.json"
+current_level = 10

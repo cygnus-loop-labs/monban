@@ -46,4 +46,5 @@ pub struct DecksConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WKDeckConfig {
     pub deck: String,
+    pub current_level: u32,
 }

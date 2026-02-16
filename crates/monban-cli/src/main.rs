@@ -50,13 +50,13 @@ fn main() {
             .user_decks
             .decks
             .iter()
-            .map(|(name, file)| PlainDeckLoader::load(name, file))
+            .map(|(name, file)| PlainDeckLoader::load(name, file, &config))
             .collect::<Vec<Deck>>(),
     );
 
-    if let Some(wk) = config.wk_deck {
+    if let Some(wk) = &config.wk_deck {
         tracing::info!("Load WK deck");
-        decks.push(WKDeckLoader::load("wk", wk.deck));
+        decks.push(WKDeckLoader::load("wk", &wk.deck, &config));
     }
 
     check_words(&mut words, &decks);
