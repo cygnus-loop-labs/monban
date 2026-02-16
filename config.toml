@@ -13,8 +13,8 @@ exclude_chars = ["ー", "〜"]
 "動詞" = ["自立"]
 "感動詞" = ["*"]
 
-[user_decks]
-decks = [
-    "data/kaishi.txt"
-]
+[user_decks.decks]
+"kaishi" = "data/kaishi.txt"
 
+[wk_deck]
+deck = "data/wk.json"

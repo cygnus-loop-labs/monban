@@ -5,7 +5,7 @@ use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
 use monban_core::{Config, Deck, Lexicon};
-use monban_parser::{Parser, PlainDeckLoader};
+use monban_parser::{DeckLoader as _, Parser, PlainDeckLoader, WKDeckLoader};
 
 #[derive(Clone, ValueEnum)]
 enum InputType {
@@ -43,12 +43,21 @@ fn main() {
         InputType::Epub => parser.load_epub(cli.input),
     };
 
-    let decks = config
-        .user_decks
-        .decks
-        .iter()
-        .map(PlainDeckLoader::load)
-        .collect::<Vec<Deck>>();
+    let mut decks = Vec::new();
+
+    decks.append(
+        &mut config
+            .user_decks
+            .decks
+            .iter()
+            .map(|(name, file)| PlainDeckLoader::load(name, file))
+            .collect::<Vec<Deck>>(),
+    );
+
+    if let Some(wk) = config.wk_deck {
+        tracing::info!("Load WK deck");
+        decks.push(WKDeckLoader::load("wk", wk.deck));
+    }
 
     check_words(&mut words, &decks);
 

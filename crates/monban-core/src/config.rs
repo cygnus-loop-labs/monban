@@ -9,6 +9,7 @@ pub struct Config {
     pub dictionary: DictionaryConfig,
     pub parser: ParserConfig,
     pub user_decks: DecksConfig,
+    pub wk_deck: Option<WKDeckConfig>,
 }
 
 impl Config {
@@ -39,5 +40,10 @@ pub struct FilteringConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DecksConfig {
-    pub decks: Vec<String>,
+    pub decks: HashMap<String, String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WKDeckConfig {
+    pub deck: String,
 }

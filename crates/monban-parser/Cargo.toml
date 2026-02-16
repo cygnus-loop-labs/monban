@@ -8,5 +8,6 @@ epub = { workspace = true }
 lindera = { workspace = true }
 monban-core = { path = "../monban-core/" }
 scraper = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
