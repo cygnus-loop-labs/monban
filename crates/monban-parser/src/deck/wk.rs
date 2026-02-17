@@ -38,11 +38,19 @@ impl DeckLoader for WKDeckLoader {
             .unwrap_or(0);
 
         for entry in &entries.kanji {
-            deck.add_kanji(entry.characters.clone(), entry.level, level >= entry.level);
+            deck.add_kanji(
+                entry.characters.clone(),
+                level >= entry.level,
+                vec![format!("wk_level={}", entry.level)],
+            );
         }
 
         for entry in &entries.vocabulary {
-            deck.add_word(entry.characters.clone(), entry.level, level >= entry.level);
+            deck.add_word(
+                entry.characters.clone(),
+                level >= entry.level,
+                vec![format!("wk_level={}", entry.level)],
+            );
         }
 
         deck

@@ -6,7 +6,6 @@ pub struct Word {
     pub valid: bool,
     pub count: u32,
     pub learned: bool,
-    pub level: u32,
     pub tags: Vec<String>,
 }
 
@@ -19,7 +18,6 @@ impl Word {
             valid,
             count: 1,
             learned: false,
-            level: 0,
             tags: Vec::new(),
         }
     }
