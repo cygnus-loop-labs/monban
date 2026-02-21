@@ -24,23 +24,17 @@ struct WKDeckFile {
 pub struct WKDeckLoader;
 
 impl DeckLoader for WKDeckLoader {
-    fn load(name: &str, file: impl AsRef<Path>, config: &Config) -> Deck {
+    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Deck {
         let content = fs::read_to_string(file).unwrap();
 
         let entries: WKDeckFile = serde_json::from_str(&content).unwrap();
 
-        let mut deck = Deck::new(name);
-
-        let level = config
-            .wk_deck
-            .as_ref()
-            .map(|d| d.current_level)
-            .unwrap_or(0);
+        let mut deck = Deck::new();
 
         for entry in &entries.kanji {
             deck.add_kanji(
                 entry.characters.clone(),
-                level >= entry.level,
+                true,
                 vec![format!("wk_level={}", entry.level)],
             );
         }
@@ -48,8 +42,8 @@ impl DeckLoader for WKDeckLoader {
         for entry in &entries.vocabulary {
             deck.add_word(
                 entry.characters.clone(),
-                level >= entry.level,
-                vec![format!("wk_level={}", entry.level)],
+                true,
+                vec![format!("{}={}", &name, entry.level)],
             );
         }
 

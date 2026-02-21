@@ -8,15 +8,13 @@ pub struct DeckEntry {
 }
 
 pub struct Deck {
-    name: String,
     words: HashMap<String, DeckEntry>,
     kanji: HashMap<String, DeckEntry>,
 }
 
 impl Deck {
-    pub fn new(name: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            name: name.to_string(),
             words: HashMap::new(),
             kanji: HashMap::new(),
         }
@@ -34,8 +32,13 @@ impl Deck {
     pub fn check(&self, word: &mut Word) {
         if let Some(e) = self.words.get(&word.word) {
             word.learned |= e.learned;
-            word.tags.push(self.name.clone());
             word.tags.extend_from_slice(&e.tags);
         }
+    }
+}
+
+impl Default for Deck {
+    fn default() -> Self {
+        Self::new()
     }
 }

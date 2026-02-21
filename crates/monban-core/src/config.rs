@@ -8,8 +8,7 @@ const DEFAULT_CONFIG: &str = include_str!("../../../config.toml");
 pub struct Config {
     pub dictionary: DictionaryConfig,
     pub parser: ParserConfig,
-    pub user_decks: DecksConfig,
-    pub wk_deck: Option<WKDeckConfig>,
+    pub decks: HashMap<String, DeckConfig>,
 }
 
 impl Config {
@@ -39,12 +38,8 @@ pub struct FilteringConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct DecksConfig {
-    pub decks: HashMap<String, String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct WKDeckConfig {
-    pub deck: String,
-    pub current_level: u32,
+pub struct DeckConfig {
+    pub file: String,
+    #[serde(rename = "type")]
+    pub ty: String,
 }

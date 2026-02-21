@@ -1,5 +1,6 @@
 use std::{
     collections::{HashMap, HashSet},
+    fs,
     path::Path,
 };
 
@@ -40,15 +41,23 @@ impl Parser {
         }
     }
 
-    pub fn load_text(&self, file: impl AsRef<Path>) -> Lexicon {
-        self.parse_content(PlainTextLoader::load(file))
+    pub fn load_blacklist(&self, file: impl AsRef<Path>) -> HashSet<String> {
+        fs::read_to_string(file)
+            .unwrap()
+            .lines()
+            .map(|l| l.to_string())
+            .collect()
     }
 
-    pub fn load_epub(&self, file: impl AsRef<Path>) -> Lexicon {
-        self.parse_content(EpubTextLoader::load(file))
+    pub fn load_text(&self, file: impl AsRef<Path>, blacklist: &HashSet<String>) -> Lexicon {
+        self.parse_content(PlainTextLoader::load(file), blacklist)
     }
 
-    fn parse_content(&self, content: Vec<String>) -> Lexicon {
+    pub fn load_epub(&self, file: impl AsRef<Path>, blacklist: &HashSet<String>) -> Lexicon {
+        self.parse_content(EpubTextLoader::load(file), blacklist)
+    }
+
+    fn parse_content(&self, content: Vec<String>, blacklist: &HashSet<String>) -> Lexicon {
         let mut tokens: Vec<Token> = vec![];
 
         (0..content.len()).for_each(|i| {
@@ -80,7 +89,13 @@ impl Parser {
                     valid,
                 )
             })
-            .filter(|word| self.filter(word))
+            .filter(|word| {
+                if blacklist.contains(&word.word) {
+                    false
+                } else {
+                    self.filter(word)
+                }
+            })
             .collect::<Vec<Word>>();
 
         let mut lex = Lexicon::new();

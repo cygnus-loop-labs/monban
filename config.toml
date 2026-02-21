@@ -1,6 +1,6 @@
 [dictionary]
-words = "data/jmdict.json"
-kanji = "data/kanji.json"
+words = "data/dict/jmdict.json"
+kanji = "data/dict/kanji.json"
 
 [parser]
 dictionary = "embedded://ipadic"
@@ -13,9 +13,8 @@ exclude_chars = ["ー", "〜"]
 "動詞" = ["自立"]
 "感動詞" = ["*"]
 
-[user_decks.decks]
-"kaishi" = "data/kaishi.txt"
+[decks]
+"kaishi" = { file="data/decks/kaishi.txt", type="plain" }
+"wk" = { file="data/decks/wk.json", type="wk" }
+"jlpt" = { file="data/decks/jlpt.json", type="jlpt" }
 
-[wk_deck]
-deck = "data/wk.json"
-current_level = 10
