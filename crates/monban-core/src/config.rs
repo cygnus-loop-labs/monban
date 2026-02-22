@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 
-const DEFAULT_CONFIG: &str = include_str!("../../../config.toml");
+const DEFAULT_CONFIG: &str = include_str!("../../../config/config.toml");
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
