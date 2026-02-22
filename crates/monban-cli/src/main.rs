@@ -1,12 +1,14 @@
 use std::{collections::HashSet, io::stdout, path::PathBuf};
 
 use clap::{Parser as ClapParser, ValueEnum};
+use serde_json::json;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
-use monban_core::{Config, Deck, Lexicon};
-use monban_service::parsing::{
-    DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader,
+use monban_core::{Config, Deck};
+use monban_service::{
+    analysis::analyzer::WordAnalyzer,
+    parsing::{DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader},
 };
 
 #[derive(Clone, ValueEnum)]
@@ -63,17 +65,19 @@ fn main() {
         })
         .collect::<Vec<Deck>>();
 
-    check_words(&mut words, decks);
-
-    serde_json::to_writer_pretty(stdout(), &words).expect("Cannot export words");
-}
-
-fn check_words(words: &mut Lexicon, decks: &[Deck]) {
-    for word in &mut words.iter_mut() {
-        for deck in decks {
+    for word in words.iter_mut() {
+        for deck in decks.iter_mut() {
             deck.check(word);
         }
     }
+
+    let analyzer = WordAnalyzer::new(&config);
+
+    let stats = analyzer.analyze(&words);
+
+    let output = json!({"stats": stats, "lexicon": words});
+
+    serde_json::to_writer_pretty(stdout(), &output).expect("Cannot export words");
 }
 
 fn init_logger() {

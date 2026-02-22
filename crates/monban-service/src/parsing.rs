@@ -4,11 +4,7 @@ pub mod input;
 
 pub use self::deck::{DeckLoader, JLPTDeckLoader, PlainDeckLoader, WKDeckLoader};
 
-use std::{
-    collections::{HashMap, HashSet},
-    fs,
-    path::Path,
-};
+use std::{collections::HashSet, fs, path::Path};
 
 use lindera::{
     dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, token::Token,
@@ -16,6 +12,8 @@ use lindera::{
 };
 
 use monban_core::{Config, Lexicon, Word};
+
+use crate::analysis::filtering::WordFilter;
 
 use self::{
     dict::JMDict,
@@ -29,8 +27,7 @@ const DETAILS_BASE: usize = 6;
 pub struct Parser {
     tokenizer: Tokenizer,
     dict: JMDict,
-    include_filter: HashMap<String, HashSet<String>>,
-    exclude_chars: Vec<String>,
+    filter: WordFilter,
 }
 
 impl Parser {
@@ -42,8 +39,7 @@ impl Parser {
         Self {
             tokenizer: Tokenizer::new(Segmenter::new(Mode::Normal, ipadic, None)),
             dict,
-            include_filter: config.parser.filtering.include.clone(),
-            exclude_chars: config.parser.filtering.exclude_chars.clone(),
+            filter: WordFilter::new(config),
         }
     }
 
@@ -99,7 +95,7 @@ impl Parser {
                 if blacklist.contains(&word.word) {
                     false
                 } else {
-                    self.filter(word)
+                    self.filter.filter(word)
                 }
             })
             .collect::<Vec<Word>>();
@@ -115,27 +111,5 @@ impl Parser {
         }
 
         lex
-    }
-
-    fn filter(&self, word: &Word) -> bool {
-        if !word.valid {
-            return false;
-        }
-
-        if self.exclude_chars.contains(&word.word) {
-            return false;
-        }
-
-        if word.word.chars().all(|c| !c.is_alphabetic()) {
-            tracing::debug!(target: "parser", "Filtering non alpha words: {}", &word.word);
-            return false;
-        }
-
-        if let Some(cat) = self.include_filter.get(&word.cat) {
-            cat.contains(&word.subcat)
-        } else {
-            tracing::debug!(target: "parser", "Filtering word: {}: {}, {}", &word.word, &word.cat, &word.subcat);
-            false
-        }
     }
 }
