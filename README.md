@@ -25,5 +25,5 @@ Active development.
 
 ## Credit
 
-This tool uses the JMdict/EDICT and KANJIDIC dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence.
-JLPT vocabulary data by Jonathan Waller (https://www.tanos.co.uk/jlpt/) - License: Creative Commons BY — https://creativecommons.org/licenses/by/4.0/
+- This tool uses the JMdict/EDICT and KANJIDIC dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence.
+- JLPT vocabulary data by Jonathan Waller (https://www.tanos.co.uk/jlpt/) - License: Creative Commons BY — https://creativecommons.org/licenses/by/4.0/
