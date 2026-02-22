@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 clap = { workspace = true }
 monban-core = { path = "../monban-core/" }
-monban-parser = { path = "../monban-parser/" }
+monban-service = { path = "../monban-service/" }
+serde_json = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

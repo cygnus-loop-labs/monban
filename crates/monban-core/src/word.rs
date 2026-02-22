@@ -1,4 +1,6 @@
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+use serde::Serialize;
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Serialize)]
 pub struct Word {
     pub word: String,
     pub cat: String,

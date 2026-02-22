@@ -1,3 +1,9 @@
+pub mod deck;
+pub mod dict;
+pub mod input;
+
+pub use self::deck::{DeckLoader, JLPTDeckLoader, PlainDeckLoader, WKDeckLoader};
+
 use std::{
     collections::{HashMap, HashSet},
     fs,
@@ -11,7 +17,7 @@ use lindera::{
 
 use monban_core::{Config, Lexicon, Word};
 
-use crate::{
+use self::{
     dict::JMDict,
     input::{EpubTextLoader, PlainTextLoader},
 };

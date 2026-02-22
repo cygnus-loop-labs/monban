@@ -2,7 +2,7 @@ use std::{fs, path::Path};
 
 use monban_core::{Config, Deck};
 
-use crate::deck::DeckLoader;
+use crate::parsing::DeckLoader;
 
 pub struct PlainDeckLoader;
 

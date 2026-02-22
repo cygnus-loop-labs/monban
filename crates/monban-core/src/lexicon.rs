@@ -1,7 +1,9 @@
 use indexmap::{IndexMap, map::Entry};
+use serde::Serialize;
 
 use crate::{Kanji, Word};
 
+#[derive(Serialize)]
 pub struct Lexicon {
     pub words: IndexMap<String, Word>,
     pub kanji: IndexMap<char, Kanji>,

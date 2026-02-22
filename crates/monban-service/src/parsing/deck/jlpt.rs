@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use monban_core::{Config, Deck};
 
-use crate::deck::DeckLoader;
+use crate::parsing::DeckLoader;
 
 #[derive(Debug, Serialize, Deserialize)]
 enum JLPTLevel {

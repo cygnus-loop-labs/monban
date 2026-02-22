@@ -1,11 +1,13 @@
-use std::{collections::HashSet, path::PathBuf};
+use std::{collections::HashSet, io::stdout, path::PathBuf};
 
 use clap::{Parser as ClapParser, ValueEnum};
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
 use monban_core::{Config, Deck, Lexicon};
-use monban_parser::{DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader};
+use monban_service::parsing::{
+    DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader,
+};
 
 #[derive(Clone, ValueEnum)]
 enum InputType {
@@ -18,7 +20,6 @@ struct Cli {
     #[arg(short, long, required = true)]
     input: PathBuf,
     #[arg(short, long)]
-    sort: bool,
     #[arg(
         short,
         long = "type",
@@ -64,7 +65,7 @@ fn main() {
 
     check_words(&mut words, decks);
 
-    dump_words(&words, cli.sort);
+    serde_json::to_writer_pretty(stdout(), &words).expect("Cannot export words");
 }
 
 fn check_words(words: &mut Lexicon, decks: &[Deck]) {
@@ -72,17 +73,6 @@ fn check_words(words: &mut Lexicon, decks: &[Deck]) {
         for deck in decks {
             deck.check(word);
         }
-    }
-}
-
-fn dump_words(words: &Lexicon, sort: bool) {
-    let mut results: Vec<_> = words.iter().collect();
-    if sort {
-        results.sort_by_key(|w| std::cmp::Reverse(w.count));
-    }
-
-    for word in &mut results {
-        println!("{:?}", word);
     }
 }
 

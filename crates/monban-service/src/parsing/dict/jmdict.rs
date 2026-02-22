@@ -39,3 +39,9 @@ impl JMDict {
         }
     }
 }
+
+impl Default for JMDict {
+    fn default() -> Self {
+        Self::new()
+    }
+}
