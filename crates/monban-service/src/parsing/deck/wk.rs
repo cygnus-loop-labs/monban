@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{collections::HashSet, fs, path::Path};
 
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +35,7 @@ impl DeckLoader for WKDeckLoader {
             deck.add_kanji(
                 entry.characters.clone(),
                 true,
-                vec![format!("wk_level={}", entry.level)],
+                HashSet::from([format!("wk_level={}", entry.level)]),
             );
         }
 
@@ -43,7 +43,7 @@ impl DeckLoader for WKDeckLoader {
             deck.add_word(
                 entry.characters.clone(),
                 true,
-                vec![format!("{}={}", &name, entry.level)],
+                HashSet::from([format!("{}={}", &name, entry.level)]),
             );
         }
 

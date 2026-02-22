@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{collections::HashSet, fs, path::Path};
 
 use serde::{Deserialize, Serialize};
 
@@ -43,7 +43,7 @@ impl DeckLoader for JLPTDeckLoader {
             deck.add_word(
                 entry.word.clone(),
                 true,
-                vec![format!("{}={:?}", &name, entry.level)],
+                HashSet::from([format!("{}={:?}", &name, entry.level)]),
             );
         }
 
