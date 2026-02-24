@@ -1,27 +1,35 @@
-use std::{collections::HashSet, io::stdout, path::PathBuf};
+use std::{io::stdout, path::PathBuf};
 
 use clap::{Parser as ClapParser, ValueEnum};
 use serde_json::json;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::EnvFilter;
 
-use monban_core::{Config, Deck};
+use monban_core::Config;
 use monban_service::{
     analysis::analyzer::WordAnalyzer,
-    parsing::{DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader},
+    commands::analyze::{InputType, cmd_analyze},
 };
 
 #[derive(Clone, ValueEnum)]
-enum InputType {
+enum CliInputType {
     Txt,
     Epub,
+}
+
+impl From<CliInputType> for InputType {
+    fn from(t: CliInputType) -> Self {
+        match t {
+            CliInputType::Txt => InputType::Txt,
+            CliInputType::Epub => InputType::Epub,
+        }
+    }
 }
 
 #[derive(ClapParser)]
 struct Cli {
     #[arg(short, long, required = true)]
     input: PathBuf,
-    #[arg(short, long)]
     #[arg(
         short,
         long = "type",
@@ -29,7 +37,7 @@ struct Cli {
         value_enum,
         value_name = "txt|epub"
     )]
-    ty: InputType,
+    ty: CliInputType,
     #[arg(short, long)]
     blacklist: Option<String>,
 }
@@ -39,43 +47,15 @@ fn main() {
 
     let config = Config::load();
 
-    let parser = Parser::new(&config);
-
     let cli = Cli::parse();
 
-    let blacklist = if let Some(blacklist) = &cli.blacklist {
-        parser.load_blacklist(blacklist)
-    } else {
-        HashSet::default()
-    };
-
-    let mut words = match cli.ty {
-        InputType::Txt => parser.load_text(cli.input, &blacklist),
-        InputType::Epub => parser.load_epub(cli.input, &blacklist),
-    };
-
-    let decks = &mut config
-        .decks
-        .iter()
-        .map(|(name, params)| match params.ty.as_str() {
-            "plain" => PlainDeckLoader::load(name.to_string(), &params.file, &config),
-            "wk" => WKDeckLoader::load(name.to_string(), &params.file, &config),
-            "jlpt" => JLPTDeckLoader::load(name.to_string(), &params.file, &config),
-            _ => unimplemented!(),
-        })
-        .collect::<Vec<Deck>>();
-
-    for word in words.iter_mut() {
-        for deck in decks.iter_mut() {
-            deck.check(word);
-        }
-    }
+    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into(), cli.blacklist);
 
     let analyzer = WordAnalyzer::new(&config);
 
-    let stats = analyzer.analyze(&words);
+    let stats = analyzer.analyze(&lexicon);
 
-    let output = json!({"stats": stats, "lexicon": words});
+    let output = json!({"stats": stats, "lexicon": lexicon});
 
     serde_json::to_writer_pretty(stdout(), &output).expect("Cannot export words");
 }

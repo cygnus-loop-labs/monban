@@ -42,7 +42,7 @@ impl DeckLoader for JLPTDeckLoader {
         for entry in &entries.vocabulary {
             deck.add_word(
                 entry.word.clone(),
-                true,
+                false,
                 HashSet::from([format!("{}={:?}", &name, entry.level)]),
             );
         }
