@@ -1,6 +1,8 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+
+use crate::WordCategory;
 
 const DEFAULT_CONFIG: &str = include_str!("../../../config/config.toml");
 
@@ -29,11 +31,11 @@ pub struct DictionaryConfig {
 pub struct ParserConfig {
     pub dictionary: String,
     pub filtering: FilteringConfig,
+    pub mapping: HashMap<WordCategory, Vec<(String, String)>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FilteringConfig {
-    pub include: HashMap<String, HashSet<String>>,
     pub exclude_chars: Vec<String>,
 }
 

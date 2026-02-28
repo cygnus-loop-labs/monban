@@ -1,8 +1,8 @@
-use std::{collections::HashSet, fs, path::Path};
+use std::{fs, path::Path};
 
 use serde::{Deserialize, Serialize};
 
-use monban_core::{Config, Deck};
+use monban_core::{Config, Deck, DictionaryItem, Kanji, Word, WordCategory};
 
 use crate::parsing::DeckLoader;
 
@@ -32,19 +32,16 @@ impl DeckLoader for WKDeckLoader {
         let mut deck = Deck::new();
 
         for entry in &entries.kanji {
-            deck.add_kanji(
-                entry.characters.clone(),
-                true,
-                HashSet::from([format!("wk_level={}", entry.level)]),
-            );
+            let mut kanji = Kanji::new(entry.characters.chars().next().unwrap());
+            kanji.tag(format!("wk_level={}", entry.level));
+
+            deck.add_kanji(kanji);
         }
 
         for entry in &entries.vocabulary {
-            deck.add_word(
-                entry.characters.clone(),
-                true,
-                HashSet::from([format!("{}={}", &name, entry.level)]),
-            );
+            let mut word = Word::new(entry.characters.clone(), WordCategory::Unknown);
+            word.tag(format!("{}={}", &name, entry.level));
+            deck.add_word(word);
         }
 
         deck

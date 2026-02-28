@@ -1,8 +1,8 @@
-use std::{collections::HashSet, fs, path::Path};
+use std::{fs, path::Path};
 
 use serde::{Deserialize, Serialize};
 
-use monban_core::{Config, Deck};
+use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
 
 use crate::parsing::DeckLoader;
 
@@ -40,11 +40,10 @@ impl DeckLoader for JLPTDeckLoader {
         let mut deck = Deck::new();
 
         for entry in &entries.vocabulary {
-            deck.add_word(
-                entry.word.clone(),
-                false,
-                HashSet::from([format!("{}={:?}", &name, entry.level)]),
-            );
+            let mut word = Word::new(entry.word.clone(), WordCategory::Unknown);
+            word.tag(format!("{}={:?}", &name, entry.level));
+
+            deck.add_word(word);
         }
 
         deck

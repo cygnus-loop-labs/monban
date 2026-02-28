@@ -8,10 +8,11 @@ dictionary = "embedded://ipadic"
 [parser.filtering]
 exclude_chars = ["ー", "〜"]
 
-[parser.filtering.include]
-"名詞" = ["一般", "サ変接続"]
-"動詞" = ["自立"]
-"感動詞" = ["*"]
+[parser.mapping]
+Noun = [["名詞", "一般"], ["名詞", "サ変接続"]]
+Verb = [["動詞", "自立"]]
+Adjective = [["形容詞", "*"], ["名詞", "形容動詞語幹"]]
+Misc = [["感動詞", "*"]]
 
 [decks]
 "kaishi" = { file="data/decks/kaishi.txt", type="plain" }

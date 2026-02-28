@@ -1,6 +1,6 @@
-use std::{collections::HashSet, fs, path::Path};
+use std::{fs, path::Path};
 
-use monban_core::{Config, Deck};
+use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
 
 use crate::parsing::DeckLoader;
 
@@ -15,7 +15,10 @@ impl DeckLoader for PlainDeckLoader {
         let words: Vec<String> = serde_json::from_str(&content).unwrap();
 
         for word in words {
-            deck.add_word(word, true, HashSet::from([name.clone()]));
+            let mut word = Word::new(word, WordCategory::Unknown);
+            word.tag(name.clone());
+
+            deck.add_word(word);
         }
 
         deck

@@ -4,14 +4,18 @@ pub mod input;
 
 pub use self::deck::{DeckLoader, JLPTDeckLoader, PlainDeckLoader, WKDeckLoader};
 
-use std::{collections::HashSet, fs, path::Path};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::Path,
+};
 
 use lindera::{
     dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, token::Token,
     tokenizer::Tokenizer,
 };
 
-use monban_core::{Config, Lexicon, Word};
+use monban_core::{Config, Lexicon, Word, WordCategory};
 
 use crate::analysis::filtering::WordFilter;
 
@@ -28,6 +32,7 @@ pub struct Parser {
     tokenizer: Tokenizer,
     dict: JMDict,
     filter: WordFilter,
+    mapper: HashMap<WordCategory, Vec<(String, String)>>,
 }
 
 impl Parser {
@@ -40,6 +45,7 @@ impl Parser {
             tokenizer: Tokenizer::new(Segmenter::new(Mode::Normal, ipadic, None)),
             dict,
             filter: WordFilter::new(config),
+            mapper: config.parser.mapping.clone(),
         }
     }
 
@@ -82,20 +88,38 @@ impl Parser {
                     details[DETAILS_BASE].to_string()
                 };
 
-                let valid = self.dict.words.contains(&word);
+                let cat = details[DETAILS_CATEGORY].to_string();
+                let subcat = details[DETAILS_SUBCATEGORY1].to_string();
 
-                Word::new(
-                    word,
-                    details[DETAILS_CATEGORY].to_string(),
-                    details[DETAILS_SUBCATEGORY1].to_string(),
-                    valid,
-                )
+                let word_cat = {
+                    let mut word_cat = WordCategory::Unknown;
+                    'outer: for (c, patterns) in &self.mapper {
+                        for pattern in patterns {
+                            if pattern.0 == cat && (pattern.1 == subcat || pattern.1 == "*") {
+                                word_cat = *c;
+                                break 'outer;
+                            }
+                        }
+                    }
+
+                    word_cat
+                };
+
+                if word_cat == WordCategory::Unknown {
+                    tracing::debug!("Category no found: {}: {}/{}", word, cat, subcat);
+                }
+
+                Word::new(word, word_cat)
             })
             .filter(|word| {
-                if blacklist.contains(&word.word) {
-                    false
+                if self.dict.words.contains(&word.word) {
+                    if blacklist.contains(&word.word) {
+                        false
+                    } else {
+                        self.filter.filter(word)
+                    }
                 } else {
-                    self.filter.filter(word)
+                    false
                 }
             })
             .collect::<Vec<Word>>();

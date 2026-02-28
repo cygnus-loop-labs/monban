@@ -1,26 +1,22 @@
-use std::collections::{HashMap, HashSet};
-
-use monban_core::{Config, Word};
+use monban_core::{Config, Word, WordCategory};
 
 pub struct WordFilter {
-    include_filter: HashMap<String, HashSet<String>>,
     exclude_chars: Vec<String>,
 }
 
 impl WordFilter {
     pub fn new(config: &Config) -> Self {
         Self {
-            include_filter: config.parser.filtering.include.clone(),
             exclude_chars: config.parser.filtering.exclude_chars.clone(),
         }
     }
 
     pub fn filter(&self, word: &Word) -> bool {
-        if !word.valid {
+        if self.exclude_chars.contains(&word.word) {
             return false;
         }
 
-        if self.exclude_chars.contains(&word.word) {
+        if word.cat == WordCategory::Unknown {
             return false;
         }
 
@@ -29,11 +25,6 @@ impl WordFilter {
             return false;
         }
 
-        if let Some(cat) = self.include_filter.get(&word.cat) {
-            cat.contains(&word.subcat)
-        } else {
-            tracing::debug!(target: "parser", "Filtering word: {}: {}, {}", &word.word, &word.cat, &word.subcat);
-            false
-        }
+        true
     }
 }

@@ -1,15 +1,10 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use crate::Word;
-
-pub struct DeckEntry {
-    learned: bool,
-    tags: HashSet<String>,
-}
+use crate::{Kanji, Word};
 
 pub struct Deck {
-    words: HashMap<String, DeckEntry>,
-    kanji: HashMap<String, DeckEntry>,
+    words: HashMap<String, Word>,
+    kanji: HashMap<String, Kanji>,
 }
 
 impl Deck {
@@ -20,13 +15,12 @@ impl Deck {
         }
     }
 
-    pub fn add_word(&mut self, word: String, learned: bool, tags: HashSet<String>) {
-        self.words.insert(word.clone(), DeckEntry { learned, tags });
+    pub fn add_word(&mut self, word: Word) {
+        self.words.insert(word.word.clone(), word);
     }
 
-    pub fn add_kanji(&mut self, kanji: String, learned: bool, tags: HashSet<String>) {
-        self.kanji
-            .insert(kanji.clone(), DeckEntry { learned, tags });
+    pub fn add_kanji(&mut self, kanji: Kanji) {
+        self.kanji.insert(kanji.kanji.to_string(), kanji);
     }
 
     pub fn check(&self, word: &mut Word) {
