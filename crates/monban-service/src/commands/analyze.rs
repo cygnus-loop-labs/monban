@@ -9,19 +9,29 @@ use crate::{
 };
 use monban_core::{Config, Deck, Lexicon};
 
-pub fn cmd_analyze(
+pub fn cmd_analyze<F>(
     config: &Config,
     input: impl AsRef<Path>,
     ty: InputType,
-) -> Result<Lexicon, ParseError> {
+    on_progress: F,
+) -> Result<Lexicon, ParseError>
+where
+    F: Fn(u32),
+{
+    on_progress(0);
+
     let parser = Parser::new(config)?;
 
     let blacklist = parser.load_blacklist(&config.parser.blacklist)?;
+
+    on_progress(10);
 
     let mut lexicon = match ty {
         InputType::Txt => parser.load_text(input, &blacklist),
         InputType::Epub => parser.load_epub(input, &blacklist),
     }?;
+
+    on_progress(20);
 
     let decks = &mut config
         .decks
@@ -34,21 +44,34 @@ pub fn cmd_analyze(
         })
         .collect::<Result<Vec<Deck>, ParseError>>()?;
 
+    on_progress(50);
+
     for word in lexicon.iter_mut() {
         for deck in decks.iter_mut() {
             deck.check(word);
         }
     }
 
+    on_progress(100);
+
     Ok(lexicon)
 }
 
-pub fn cmd_stats(config: &Config, lexicon: Option<&Lexicon>) -> Stats {
+pub fn cmd_stats<F>(config: &Config, lexicon: Option<&Lexicon>, on_progress: F) -> Stats
+where
+    F: Fn(u32),
+{
+    on_progress(0);
+
     let analyzer = WordAnalyzer::new(config);
 
-    if let Some(lexicon) = lexicon {
+    let stats = if let Some(lexicon) = lexicon {
         analyzer.analyze(lexicon)
     } else {
         Stats::default()
-    }
+    };
+
+    on_progress(100);
+
+    stats
 }

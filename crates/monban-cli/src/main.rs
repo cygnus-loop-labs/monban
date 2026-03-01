@@ -48,7 +48,9 @@ fn main() -> Result<()> {
 
     let cli = Cli::parse();
 
-    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into())?;
+    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into(), |p| {
+        tracing::info!("Analysis progress: {}", p);
+    })?;
 
     let analyzer = WordAnalyzer::new(&config);
 
