@@ -1,0 +1,26 @@
+:root {
+    --bg: #282a36;
+    --bg-card: #383a4a;
+    --border: #44475a;
+    --text: #f8f8f2;
+    --subtle: #6272a4;
+    --label: #8899bb;
+    --purple: #bd93f9;
+    --pink: #ff79c6;
+    --green: #50fa7b;
+    --orange: #ffb86c;
+    --red: #ff5555;
+    --cyan: #8be9fd;
+    --yellow: #f1fa8c;
+
+    --font-size-xs: 11px;
+    --font-size-s: 13px;
+    --font-size-m: 18px;
+    --font-size-l: 22px;
+    --font-size-xl: 26px;
+    --font-size-xxl: 32px;
+    --font-size-xxxl: 38px;
+    --font-serif: 'Noto Serif JP', serif;
+    --font-mono: monospace;
+}
+

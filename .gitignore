@@ -2,3 +2,7 @@
 /data
 /scripts
 Cargo.lock
+/ui/node_modules/
+/ui/dist/
+/ui/src-tauri/gen/
+/ui/package-lock.json

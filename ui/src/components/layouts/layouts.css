@@ -1,0 +1,16 @@
+.layout {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    padding: 12px 24px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+

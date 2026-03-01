@@ -1,0 +1,56 @@
+@import "./themes/dracula.css";
+
+* { box-sizing: border-box; }
+
+body {
+    overflow: hidden;
+    margin: 0;
+}
+
+.loading {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.text-error {
+    font-size: var(--font-size-m);
+    font-family: var(--font-serif);
+    color: var(--red);
+}
+
+.text-serif-xxl {
+    font-size: var(--font-size-xxl);
+    font-family: var(--font-serif);
+    font-weight: 700;
+}
+
+.text-title-m {
+    font-size: var(--font-size-m);
+    font-family: var(--font-mono);
+    color: var(--label);
+    letter-spacing: 1px;
+}
+
+.text-title-s {
+    font-size: var(--font-size-s);
+    font-family: var(--font-mono);
+    color: var(--label);
+    letter-spacing: 1px;
+}
+
+.text-label-m {
+    font-size: var(--font-size-m);
+    font-family: var(--font-mono);
+    color: var(--label);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.text-label-s {
+    font-size: var(--font-size-m);
+    font-family: var(--font-mono);
+    color: var(--label);
+    letter-spacing: 1px;
+}
+
+

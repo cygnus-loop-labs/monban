@@ -46,6 +46,7 @@ impl DeckLoader for JLPTDeckLoader {
         for entry in &entries.vocabulary {
             let mut word = Word::new(entry.word.clone(), WordCategory::Unknown);
             word.tag(format!("{}={:?}", &name, entry.level));
+            word.learned = true;
 
             deck.add_word(word);
         }

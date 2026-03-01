@@ -20,6 +20,7 @@ impl DeckLoader for PlainDeckLoader {
         for word in words {
             let mut word = Word::new(word, WordCategory::Unknown);
             word.tag(name.clone());
+            word.learned = true;
 
             deck.add_word(word);
         }
