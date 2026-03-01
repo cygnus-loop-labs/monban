@@ -16,7 +16,5 @@ Adjective = [["形容詞", "*"], ["名詞", "形容動詞語幹"]]
 Misc = [["感動詞", "*"]]
 
 [decks]
-"kaishi" = { file="data/decks/kaishi.txt", type="plain" }
-"wk" = { file="data/decks/wk.json", type="wk" }
 "jlpt" = { file="data/decks/jlpt.json", type="jlpt" }
 
