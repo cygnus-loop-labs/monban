@@ -1,16 +1,19 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
 
-use crate::parsing::DeckLoader;
+use crate::{
+    parsing::{DeckLoader, ParseError},
+    util::load_file,
+};
 
 pub struct PlainDeckLoader;
 
 impl DeckLoader for PlainDeckLoader {
-    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Deck {
+    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Result<Deck, ParseError> {
         let mut deck = Deck::new();
 
-        let content = fs::read_to_string(file).unwrap();
+        let content = load_file(file)?;
 
         let words: Vec<String> = serde_json::from_str(&content).unwrap();
 
@@ -21,6 +24,6 @@ impl DeckLoader for PlainDeckLoader {
             deck.add_word(word);
         }
 
-        deck
+        Ok(deck)
     }
 }

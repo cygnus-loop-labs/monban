@@ -21,7 +21,7 @@ impl WordFilter {
         }
 
         if word.word.chars().all(|c| !c.is_alphabetic()) {
-            tracing::debug!(target: "parser", "Filtering non alpha words: {}", &word.word);
+            tracing::debug!(target: "Parser", "Filtering non alpha words: {}", &word.word);
             return false;
         }
 

@@ -1,10 +1,13 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
 use monban_core::{Config, Deck, DictionaryItem, Kanji, Word, WordCategory};
 
-use crate::parsing::DeckLoader;
+use crate::{
+    parsing::{DeckLoader, ParseError},
+    util::load_file,
+};
 
 #[derive(Serialize, Deserialize)]
 struct WKEntry {
@@ -24,8 +27,8 @@ struct WKDeckFile {
 pub struct WKDeckLoader;
 
 impl DeckLoader for WKDeckLoader {
-    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Deck {
-        let content = fs::read_to_string(file).unwrap();
+    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Result<Deck, ParseError> {
+        let content = load_file(file)?;
 
         let entries: WKDeckFile = serde_json::from_str(&content).unwrap();
 
@@ -44,6 +47,6 @@ impl DeckLoader for WKDeckLoader {
             deck.add_word(word);
         }
 
-        deck
+        Ok(deck)
     }
 }

@@ -4,6 +4,7 @@ kanji = "data/dict/kanji.json"
 
 [parser]
 dictionary = "embedded://ipadic"
+blacklist = "data/blacklist.txt"
 
 [parser.filtering]
 exclude_chars = ["ー", "〜"]

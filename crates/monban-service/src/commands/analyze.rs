@@ -1,33 +1,27 @@
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
+use crate::{
+    analysis::analyzer::{Stats, WordAnalyzer},
+    parsing::{
+        DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader,
+        WKDeckLoader,
+    },
+};
 use monban_core::{Config, Deck, Lexicon};
-
-use crate::parsing::{DeckLoader as _, JLPTDeckLoader, Parser, PlainDeckLoader, WKDeckLoader};
-
-#[derive(Clone)]
-pub enum InputType {
-    Txt,
-    Epub,
-}
 
 pub fn cmd_analyze(
     config: &Config,
     input: impl AsRef<Path>,
     ty: InputType,
-    blacklist: Option<impl AsRef<Path>>,
-) -> Lexicon {
-    let parser = Parser::new(config);
+) -> Result<Lexicon, ParseError> {
+    let parser = Parser::new(config)?;
 
-    let blacklist = if let Some(blacklist) = blacklist {
-        parser.load_blacklist(blacklist)
-    } else {
-        HashSet::default()
-    };
+    let blacklist = parser.load_blacklist(&config.parser.blacklist)?;
 
     let mut lexicon = match ty {
         InputType::Txt => parser.load_text(input, &blacklist),
         InputType::Epub => parser.load_epub(input, &blacklist),
-    };
+    }?;
 
     let decks = &mut config
         .decks
@@ -38,7 +32,7 @@ pub fn cmd_analyze(
             "jlpt" => JLPTDeckLoader::load(name.to_string(), &params.file, config),
             _ => unimplemented!(),
         })
-        .collect::<Vec<Deck>>();
+        .collect::<Result<Vec<Deck>, ParseError>>()?;
 
     for word in lexicon.iter_mut() {
         for deck in decks.iter_mut() {
@@ -46,5 +40,15 @@ pub fn cmd_analyze(
         }
     }
 
-    lexicon
+    Ok(lexicon)
+}
+
+pub fn cmd_stats(config: &Config, lexicon: Option<&Lexicon>) -> Stats {
+    let analyzer = WordAnalyzer::new(config);
+
+    if let Some(lexicon) = lexicon {
+        analyzer.analyze(lexicon)
+    } else {
+        Stats::default()
+    }
 }

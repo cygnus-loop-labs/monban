@@ -30,6 +30,7 @@ pub struct DictionaryConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ParserConfig {
     pub dictionary: String,
+    pub blacklist: String,
     pub filtering: FilteringConfig,
     pub mapping: HashMap<WordCategory, Vec<(String, String)>>,
 }

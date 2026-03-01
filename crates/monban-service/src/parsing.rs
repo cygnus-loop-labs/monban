@@ -6,7 +6,6 @@ pub use self::deck::{DeckLoader, JLPTDeckLoader, PlainDeckLoader, WKDeckLoader};
 
 use std::{
     collections::{HashMap, HashSet},
-    fs,
     path::Path,
 };
 
@@ -16,8 +15,9 @@ use lindera::{
 };
 
 use monban_core::{Config, Lexicon, Word, WordCategory};
+use thiserror::Error;
 
-use crate::analysis::filtering::WordFilter;
+use crate::{analysis::filtering::WordFilter, util::load_file};
 
 use self::{
     dict::JMDict,
@@ -28,6 +28,22 @@ const DETAILS_CATEGORY: usize = 0;
 const DETAILS_SUBCATEGORY1: usize = 1;
 const DETAILS_BASE: usize = 6;
 
+#[derive(Debug, Clone)]
+pub enum InputType {
+    Txt,
+    Epub,
+}
+
+#[derive(Debug, Error)]
+pub enum ParseError {
+    #[error("Invalid file type: {0:?}")]
+    InvalidFileType(InputType),
+    #[error("Invalid file format: {0}")]
+    InvalidFileFormat(String),
+    #[error("File not found: {0}")]
+    FileNotFound(String),
+}
+
 pub struct Parser {
     tokenizer: Tokenizer,
     dict: JMDict,
@@ -36,36 +52,44 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn new(config: &Config) -> Self {
+    pub fn new(config: &Config) -> Result<Self, ParseError> {
         let ipadic = load_dictionary(&config.parser.dictionary).unwrap();
         let mut dict = JMDict::new();
-        dict.load(&config.dictionary.words, &config.dictionary.kanji);
+        dict.load(&config.dictionary.words, &config.dictionary.kanji)?;
 
-        Self {
+        Ok(Self {
             tokenizer: Tokenizer::new(Segmenter::new(Mode::Normal, ipadic, None)),
             dict,
             filter: WordFilter::new(config),
             mapper: config.parser.mapping.clone(),
-        }
+        })
     }
 
-    pub fn load_blacklist(&self, file: impl AsRef<Path>) -> HashSet<String> {
-        fs::read_to_string(file)
-            .unwrap()
-            .lines()
-            .map(|l| l.to_string())
-            .collect()
+    pub fn load_blacklist(&self, file: impl AsRef<Path>) -> Result<HashSet<String>, ParseError> {
+        Ok(load_file(file)?.lines().map(|l| l.to_string()).collect())
     }
 
-    pub fn load_text(&self, file: impl AsRef<Path>, blacklist: &HashSet<String>) -> Lexicon {
-        self.parse_content(PlainTextLoader::load(file), blacklist)
+    pub fn load_text(
+        &self,
+        file: impl AsRef<Path>,
+        blacklist: &HashSet<String>,
+    ) -> Result<Lexicon, ParseError> {
+        self.parse_content(PlainTextLoader::load(file)?, blacklist)
     }
 
-    pub fn load_epub(&self, file: impl AsRef<Path>, blacklist: &HashSet<String>) -> Lexicon {
-        self.parse_content(EpubTextLoader::load(file), blacklist)
+    pub fn load_epub(
+        &self,
+        file: impl AsRef<Path>,
+        blacklist: &HashSet<String>,
+    ) -> Result<Lexicon, ParseError> {
+        self.parse_content(EpubTextLoader::load(file)?, blacklist)
     }
 
-    fn parse_content(&self, content: Vec<String>, blacklist: &HashSet<String>) -> Lexicon {
+    fn parse_content(
+        &self,
+        content: Vec<String>,
+        blacklist: &HashSet<String>,
+    ) -> Result<Lexicon, ParseError> {
         let mut tokens: Vec<Token> = vec![];
 
         (0..content.len()).for_each(|i| {
@@ -106,7 +130,8 @@ impl Parser {
                 };
 
                 if word_cat == WordCategory::Unknown {
-                    tracing::debug!("Category no found: {}: {}/{}", word, cat, subcat);
+                    tracing::debug!(target: "Parser",
+                        "Category no found: {}: {}/{}", word, cat, subcat);
                 }
 
                 Word::new(word, word_cat)
@@ -134,6 +159,6 @@ impl Parser {
             lex.add_word(word);
         }
 
-        lex
+        Ok(lex)
     }
 }

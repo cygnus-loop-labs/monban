@@ -4,7 +4,7 @@ use serde::Serialize;
 
 use crate::DictionaryItem;
 
-#[derive(Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Kanji {
     pub kanji: char,
     pub count: u32,

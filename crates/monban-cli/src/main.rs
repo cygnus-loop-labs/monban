@@ -1,14 +1,13 @@
 use std::{io::stdout, path::PathBuf};
 
+use anyhow::Result;
 use clap::{Parser as ClapParser, ValueEnum};
 use serde_json::json;
-use tracing::level_filters::LevelFilter;
-use tracing_subscriber::EnvFilter;
 
 use monban_core::Config;
 use monban_service::{
-    analysis::analyzer::WordAnalyzer,
-    commands::analyze::{InputType, cmd_analyze},
+    analysis::analyzer::WordAnalyzer, commands::analyze::cmd_analyze, parsing::InputType,
+    util::init_logger,
 };
 
 #[derive(Clone, ValueEnum)]
@@ -42,14 +41,14 @@ struct Cli {
     blacklist: Option<String>,
 }
 
-fn main() {
+fn main() -> Result<()> {
     init_logger();
 
     let config = Config::load();
 
     let cli = Cli::parse();
 
-    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into(), cli.blacklist);
+    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into())?;
 
     let analyzer = WordAnalyzer::new(&config);
 
@@ -58,20 +57,6 @@ fn main() {
     let output = json!({"stats": stats, "lexicon": lexicon});
 
     serde_json::to_writer_pretty(stdout(), &output).expect("Cannot export words");
-}
 
-fn init_logger() {
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            EnvFilter::builder()
-                .with_default_directive(LevelFilter::INFO.into())
-                .from_env_lossy(),
-        )
-        .with_writer(std::io::stderr)
-        .init();
-
-    tracing::info!(
-        "Logger initialized (RUST_LOG={:?})",
-        std::env::var("RUST_LOG")
-    );
+    Ok(())
 }

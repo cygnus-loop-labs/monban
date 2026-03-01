@@ -1,10 +1,13 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
 use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
 
-use crate::parsing::DeckLoader;
+use crate::{
+    parsing::{DeckLoader, ParseError},
+    util::load_file,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 enum JLPTLevel {
@@ -32,10 +35,11 @@ struct JLPTDeckFile {
 pub struct JLPTDeckLoader;
 
 impl DeckLoader for JLPTDeckLoader {
-    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Deck {
-        let content = fs::read_to_string(file).unwrap();
+    fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Result<Deck, ParseError> {
+        let content = load_file(file)?;
 
-        let entries: JLPTDeckFile = serde_json::from_str(&content).unwrap();
+        let entries: JLPTDeckFile = serde_json::from_str(&content)
+            .map_err(|_| ParseError::InvalidFileFormat(name.clone()))?;
 
         let mut deck = Deck::new();
 
@@ -46,6 +50,6 @@ impl DeckLoader for JLPTDeckLoader {
             deck.add_word(word);
         }
 
-        deck
+        Ok(deck)
     }
 }

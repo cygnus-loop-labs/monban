@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::{Kanji, Word};
 
-#[derive(Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Lexicon {
     pub words: IndexMap<String, Word>,
     pub kanji: IndexMap<char, Kanji>,
@@ -31,7 +31,7 @@ impl Lexicon {
     pub fn add_word(&mut self, word: Word) {
         match self.words.entry(word.word.clone()) {
             Entry::Occupied(mut e) => {
-                tracing::debug!(target = "core", "Duplicate: {}", &word.word);
+                tracing::debug!(target: "Core", "Duplicate: {}", &word.word);
                 e.get_mut().count += 1;
             }
             Entry::Vacant(e) => {

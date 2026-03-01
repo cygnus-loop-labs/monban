@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 default-run = "monban-cli"
 
-
 [dependencies]
+anyhow = { workspace = true }
 clap = { workspace = true }
 monban-core = { path = "../monban-core/" }
 monban-service = { path = "../monban-service/" }
