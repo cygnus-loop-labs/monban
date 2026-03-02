@@ -2,16 +2,14 @@ import { useMemo } from "react";
 import { CoverageRing } from "../../components/ui/CoverageRing.jsx";
 import { StatCard } from "../../components/ui/StatCard.jsx";
 
-{/* <CoverageSection stats = {stats} words={Object.values(lexicon.words)} kanji={Object.values(lexicon.kanji)} tokens={lexicon.tokens} /> */}
-// export function CoverageSection({ stats, words, kanji, tokens }) {
-export function CoverageSection({ stats, lexicon }) {
-    const words = useMemo(() => Object.values(lexicon.words), [lexicon]);
+export function CoverageSection({ lexicon }) {
+    const words = useMemo(() => Object.values(lexicon.words).filter(w => !w.filter), [lexicon]);
     const kanji = useMemo(() => Object.values(lexicon.kanji), [lexicon]);
 
     const tokens = lexicon.tokens;
-    const total_words = stats.words.count;
-    const unknown_words = stats.words.unknown_count;
-    const unique_words = stats.words.unique_count;
+    const unique_words = words.length;
+    const unknown_words = useMemo(() => words.filter(w => !w.learned).length, [words]);
+    const total_words = useMemo(() => words.reduce((s, w) => s + w.count, 0), [words]);
 
     const coverage = unique_words > 0 ? (1 - unknown_words / unique_words) * 100 : 0;
 
@@ -32,7 +30,7 @@ export function CoverageSection({ stats, lexicon }) {
 
             return missing;
         },
-        [stats, words]
+        [words]
     );
 
     return (

@@ -1,11 +1,7 @@
 use std::path::Path;
 
-use crate::{
-    analysis::analyzer::{Stats, WordAnalyzer},
-    parsing::{
-        DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader,
-        WKDeckLoader,
-    },
+use crate::parsing::{
+    DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader, WKDeckLoader,
 };
 use monban_core::{Config, Deck, Lexicon};
 
@@ -55,23 +51,4 @@ where
     on_progress(100);
 
     Ok(lexicon)
-}
-
-pub fn cmd_stats<F>(config: &Config, lexicon: Option<&Lexicon>, on_progress: F) -> Stats
-where
-    F: Fn(u32),
-{
-    on_progress(0);
-
-    let analyzer = WordAnalyzer::new(config);
-
-    let stats = if let Some(lexicon) = lexicon {
-        analyzer.analyze(lexicon)
-    } else {
-        Stats::default()
-    };
-
-    on_progress(100);
-
-    stats
 }

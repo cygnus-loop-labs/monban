@@ -19,6 +19,7 @@ pub struct Word {
     pub cat: WordCategory,
     pub count: u32,
     pub learned: bool,
+    pub filter: bool,
     pub tags: HashSet<String>,
 }
 
@@ -29,6 +30,7 @@ impl Word {
             cat,
             count: 1,
             learned: false,
+            filter: false,
             tags: HashSet::new(),
         }
     }

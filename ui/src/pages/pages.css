@@ -70,20 +70,12 @@
     margin-left: auto;
 }
 
-.word-list__footer {
-    font-size: var(--font-size-m);
-    font-family: monospace;
-    padding: 12px 16px;
-    color: var(--label);
-    text-align: center;
-}
-
 .word-row {
     display: grid;
-    grid-template-columns: 28px 1fr 100px 100px 50px;
+    grid-template-columns: 28px 1fr 100px 100px 50px 32px;
     align-items: center;
     gap: 12px;
-    padding: 10px 16px;
+    padding: 8px 16px;
     border-bottom: 1px solid var(--border);
     transition: background 0.15s;
     cursor: default;
@@ -129,5 +121,32 @@
     color: var(--red);
     text-align: right;
     font-weight: 600;
+}
+
+.word-row__actions {
+    margin-left: auto;
+}
+
+.word-row__trash {
+    width: 16px;
+    height: 16px;
+}
+
+.word-row__blacklist {
+    font-size: var(--font-size-s);
+    padding: 0px 0px;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border);
+    background: transparent;
+    border-color: var(--label);
+    color: var(--label);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.word-row__blacklist:hover {
+    border-color: var(--red);
+    color: var(--red);
 }
 

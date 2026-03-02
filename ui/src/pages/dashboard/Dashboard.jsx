@@ -10,28 +10,34 @@ import LoadingScreen from '../../pages/loading/LoadingScreen.jsx';
 
 export default function Dashboard() {
     const [lexicon, setLexicon] = useState(null);
-    const [stats, setStats] = useState(null);
     const [isLoading, setIsloading] = useState(true);
     const [progress, setProgress] = useState(0);
-    const [offset, setOffset] = useState(0);
-    const [scale, setScale] = useState(0.75);
 
     const { state } = useLocation();
     const navigate = useNavigate();
+
+    const handleDeleteWord = (word) => {
+        setLexicon(prev=> ({
+            ...prev,
+            words: {
+                ...prev.words,
+                [word.word]: {
+                    ...prev.words[word.word],
+                    filter: true
+                }
+            }
+        }));
+    };
 
     useEffect(() => {
         let unlisten;
 
         listen("progress", (event) => {
-            setProgress(offset + scale * event.payload);
+            setProgress(event.payload);
         }).then(f => { unlisten = f;});
 
         invoke("analyze", {input: state?.filePath })
             .then(setLexicon)
-            .then(() => setOffset(0.75))
-            .then(() => setScale(0.25))
-            .then(() => invoke("stats"))
-            .then(setStats)
             .then(() => setIsloading(false))
             .catch(err => navigate("/", { state: { error: err}}))
             .finally(() => unlisten?.());
@@ -46,8 +52,8 @@ export default function Dashboard() {
                 <span className="home-row__picker" onClick={() => navigate("/")} title="Home">⌂ Pick new file</span>
             </div>
             <div>
-                <CoverageSection stats = {stats} lexicon={lexicon} />
-                <WordList lexicon={lexicon} />
+                <CoverageSection lexicon={lexicon} />
+                <WordList lexicon={lexicon} onDeleteWord={handleDeleteWord} />
             </div>
         </Layout>
     );

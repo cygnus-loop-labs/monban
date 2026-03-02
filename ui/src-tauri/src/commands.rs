@@ -3,11 +3,7 @@ use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter as _, State, command};
 
 use monban_core::{Config, Lexicon};
-use monban_service::{
-    analysis::analyzer::Stats,
-    commands::analyze::{cmd_analyze, cmd_stats},
-    parsing::InputType,
-};
+use monban_service::{commands::analyze::cmd_analyze, parsing::InputType};
 
 pub struct AppState {
     config: Config,
@@ -47,21 +43,4 @@ pub async fn analyze(
     state.current_lexicon = Some(lexicon.clone());
 
     Ok(lexicon)
-}
-
-#[command]
-pub async fn stats(
-    app: AppHandle,
-    state: State<'_, Arc<Mutex<AppState>>>,
-) -> Result<Stats, String> {
-    tracing::info!(target: "Tauri", "Invoke stats");
-
-    let state = state.lock().map_err(|e| e.to_string())?;
-
-    let stats = cmd_stats(&state.config, state.current_lexicon.as_ref(), |p| {
-        let _ = app.emit("progress", p).map_err(|e| e.to_string());
-        tracing::info!("Progress: {}", p);
-    });
-
-    Ok(stats)
 }
