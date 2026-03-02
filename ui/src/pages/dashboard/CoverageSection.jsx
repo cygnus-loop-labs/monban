@@ -1,25 +1,39 @@
+import { useMemo } from "react";
 import { CoverageRing } from "../../components/ui/CoverageRing.jsx";
 import { StatCard } from "../../components/ui/StatCard.jsx";
 
-export function CoverageSection({ stats, words, kanji }) {
-    const total_words = stats.words.count;
-    const total_known = words.filter(w => w.learned).reduce((s, w) => s + w.count, 0);
+{/* <CoverageSection stats = {stats} words={Object.values(lexicon.words)} kanji={Object.values(lexicon.kanji)} tokens={lexicon.tokens} /> */}
+// export function CoverageSection({ stats, words, kanji, tokens }) {
+export function CoverageSection({ stats, lexicon }) {
+    const words = useMemo(() => Object.values(lexicon.words), [lexicon]);
+    const kanji = useMemo(() => Object.values(lexicon.kanji), [lexicon]);
 
+    const tokens = lexicon.tokens;
+    const total_words = stats.words.count;
     const unknown_words = stats.words.unknown_count;
     const unique_words = stats.words.unique_count;
 
     const coverage = unique_words > 0 ? (1 - unknown_words / unique_words) * 100 : 0;
 
-    const unknown = words.filter(w => !w.learned).sort((a, b) => b.count - a.count);
+    const missing = useMemo(
+        () => {
+            const unknown = words.filter(w => !w.learned).sort((a, b) => b.count - a.count);
+            let known = words.filter(w => w.learned).reduce((s, w) => s + w.count, 0);
 
-    const target = total_words * 0.95;
-    let known = total_known;
-    let missing = 0;
-    for (const w of unknown) {
-        if (known >= target) break;
-        known += w.count;
-        missing++;
-    }
+            const target = total_words * 0.95;
+
+            let missing = 0;
+
+            for (const w of unknown) {
+                if (known >= target) break;
+                known += w.count;
+                missing++;
+            }
+
+            return missing;
+        },
+        [stats, words]
+    );
 
     return (
         <div className="coverage-section">
@@ -45,7 +59,7 @@ export function CoverageSection({ stats, words, kanji }) {
                 <StatCard
                     label="Total Word"
                     value={total_words}
-                    sub="valid content words" />
+                    sub={`${tokens} tokens`} />
             </div>
         </div>
     );

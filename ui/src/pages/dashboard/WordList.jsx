@@ -1,6 +1,13 @@
+import { useMemo } from "react";
+
 import { WordRow } from "./WordRow.jsx";
 
-export function WordList({ words }) {
+export function WordList({ lexicon }) {
+    const words = useMemo(
+        () => Object.values(lexicon.words).filter(w => !w.learned).sort((a, b) => b.count - a.count),
+        [lexicon]
+    );
+
     return (
         <div className="word-list">
             <div className="word-list__header">

@@ -7,6 +7,7 @@ use crate::{Kanji, Word};
 pub struct Lexicon {
     pub words: IndexMap<String, Word>,
     pub kanji: IndexMap<char, Kanji>,
+    pub tokens: usize,
 }
 
 impl Lexicon {
@@ -14,6 +15,7 @@ impl Lexicon {
         Self {
             words: IndexMap::new(),
             kanji: IndexMap::new(),
+            tokens: 0,
         }
     }
 

@@ -153,6 +153,8 @@ impl Parser {
             .collect::<Vec<Word>>();
 
         let mut lex = Lexicon::new();
+        lex.tokens = tokens.len();
+
         for word in words {
             for c in word.word.chars() {
                 if self.dict.kanji.contains(&c) {

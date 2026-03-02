@@ -46,8 +46,8 @@ export default function Dashboard() {
                 <span className="home-row__picker" onClick={() => navigate("/")} title="Home">⌂ Pick new file</span>
             </div>
             <div>
-                <CoverageSection stats = {stats} words={Object.values(lexicon.words)} kanji={Object.values(lexicon.kanji)} />
-                <WordList words={Object.values(lexicon.words).filter(w => !w.learned).sort((a, b) => b.count - a.count)} />
+                <CoverageSection stats = {stats} lexicon={lexicon} />
+                <WordList lexicon={lexicon} />
             </div>
         </Layout>
     );
