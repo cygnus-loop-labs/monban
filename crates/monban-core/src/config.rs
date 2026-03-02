@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -8,6 +8,8 @@ const DEFAULT_CONFIG: &str = include_str!("../../../config/config.toml");
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
+    #[serde(skip)]
+    pub data_dir: PathBuf,
     pub dictionary: DictionaryConfig,
     pub parser: ParserConfig,
     pub decks: HashMap<String, DeckConfig>,

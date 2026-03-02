@@ -6,7 +6,7 @@ use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
 
 use crate::{
     parsing::{DeckLoader, ParseError},
-    util::load_file,
+    util::load_data_file,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,7 +36,7 @@ pub struct JLPTDeckLoader;
 
 impl DeckLoader for JLPTDeckLoader {
     fn load(name: String, file: impl AsRef<Path>, _config: &Config) -> Result<Deck, ParseError> {
-        let content = load_file(file)?;
+        let content = load_data_file(file)?;
 
         let entries: JLPTDeckFile = serde_json::from_str(&content)
             .map_err(|_| ParseError::InvalidFileFormat(name.clone()))?;

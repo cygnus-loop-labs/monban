@@ -6,6 +6,6 @@ pub struct PlainTextLoader;
 
 impl PlainTextLoader {
     pub fn load(file: impl AsRef<Path>) -> Result<Vec<String>, ParseError> {
-        Ok(vec![load_file(file)?])
+        Ok(vec![load_file("", file)?])
     }
 }

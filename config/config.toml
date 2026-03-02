@@ -1,10 +1,10 @@
 [dictionary]
-words = "data/dict/jmdict.json"
-kanji = "data/dict/kanji.json"
+words = "dict/jmdict.json"
+kanji = "dict/kanji.json"
 
 [parser]
 dictionary = "embedded://ipadic"
-blacklist = "data/blacklist.txt"
+blacklist = "blacklist.txt"
 
 [parser.filtering]
 exclude_chars = ["ー", "〜"]
@@ -16,5 +16,5 @@ Adjective = [["形容詞", "*"], ["名詞", "形容動詞語幹"]]
 Misc = [["感動詞", "*"]]
 
 [decks]
-"jlpt" = { file="data/decks/jlpt.json", type="jlpt" }
+"jlpt" = { file="decks/jlpt.json", type="jlpt" }
 

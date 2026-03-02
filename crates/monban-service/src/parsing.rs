@@ -17,7 +17,7 @@ use lindera::{
 use monban_core::{Config, Lexicon, Word, WordCategory};
 use thiserror::Error;
 
-use crate::{analysis::filtering::WordFilter, util::load_file};
+use crate::{analysis::filtering::WordFilter, util::load_data_file};
 
 use self::{
     dict::JMDict,
@@ -66,7 +66,10 @@ impl Parser {
     }
 
     pub fn load_blacklist(&self, file: impl AsRef<Path>) -> Result<HashSet<String>, ParseError> {
-        Ok(load_file(file)?.lines().map(|l| l.to_string()).collect())
+        Ok(load_data_file(file)?
+            .lines()
+            .map(|l| l.to_string())
+            .collect())
     }
 
     pub fn load_text(

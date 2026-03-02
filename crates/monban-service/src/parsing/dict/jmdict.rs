@@ -1,6 +1,6 @@
 use std::{collections::HashSet, path::Path};
 
-use crate::{parsing::ParseError, util::load_file};
+use crate::{parsing::ParseError, util::load_data_file};
 
 pub struct JMDict {
     pub words: HashSet<String>,
@@ -27,7 +27,7 @@ impl JMDict {
     }
 
     pub fn load_jmdict(&mut self, file: impl AsRef<Path>) -> Result<(), ParseError> {
-        let content = load_file(file)?;
+        let content = load_data_file(file)?;
 
         let words: Vec<String> = serde_json::from_str(&content).unwrap();
 
@@ -39,7 +39,7 @@ impl JMDict {
     }
 
     pub fn load_kanji(&mut self, file: impl AsRef<Path>) -> Result<(), ParseError> {
-        let content = load_file(file)?;
+        let content = load_data_file(file)?;
 
         let kanji_s: Vec<String> = serde_json::from_str(&content).unwrap();
         let kanji: Vec<char> = kanji_s.iter().filter_map(|k| k.chars().next()).collect();

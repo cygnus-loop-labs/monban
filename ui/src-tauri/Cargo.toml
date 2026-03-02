@@ -11,6 +11,7 @@ tauri-build = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+dirs = { workspace = true }
 monban-core = { path = "../../crates/monban-core/" }
 monban-service = { path = "../../crates/monban-service/" }
 serde_json = { workspace = true }
