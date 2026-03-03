@@ -3636,7 +3636,13 @@
     "level": "N5"
   },
   {
-    "word": "見る 観る",
+    "word": "観る",
+    "reading": "みる",
+    "meaning": "to see, to watch",
+    "level": "N5"
+  },
+  {
+    "word": "見る",
     "reading": "みる",
     "meaning": "to see, to watch",
     "level": "N5"
@@ -17883,12 +17889,6 @@
     "word": "魅力",
     "reading": "みりょく",
     "meaning": "charm,fascination,glamour",
-    "level": "N3"
-  },
-  {
-    "word": "見る",
-    "reading": "みる",
-    "meaning": "to see,to watch",
     "level": "N3"
   },
   {
