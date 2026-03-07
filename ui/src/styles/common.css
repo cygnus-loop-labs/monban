@@ -12,12 +12,6 @@ body {
     color: var(--text);
 }
 
-.text-error {
-    font-size: var(--font-size-m);
-    font-family: var(--font-serif);
-    color: var(--red);
-}
-
 .text-serif-xxl {
     font-size: var(--font-size-xxl);
     font-family: var(--font-serif);
@@ -53,4 +47,22 @@ body {
     letter-spacing: 1px;
 }
 
+.error-banner {
+    font-size: var(--font-size-m);
+    font-family: var(--font-serif);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-top: 24px;
+    background: color-mix(in srgb, var(--red) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
+    border-radius: 6px;
+    color: var(--red);
+}
 
+.error-banner svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}

@@ -1,11 +1,14 @@
+import { useNavigate } from 'react-router-dom';
+
 import { resolveResource } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-dialog";
-import { useNavigate, useLocation } from 'react-router-dom';
 
-import { Layout } from '../../components/layouts/Layout.jsx';
+import { WarningCircleIcon } from "@phosphor-icons/react";
+
+import { useAppState } from "../../AppContext";
 
 export default function HomePage() {
-    const { state } = useLocation();
+    const { analyze, error } = useAppState();
     const navigate = useNavigate();
 
     async function handlePickFile() {
@@ -17,23 +20,24 @@ export default function HomePage() {
 
         if (path) {
             console.log("File picked: ", path);
-            navigate("/dashboard", { state: { filePath: path }});
+            analyze(path);
+            navigate("/dashboard");
         }
     }
 
-   return (
-        <Layout>
+    return (
+        <>
             <div className="text-title-m">
                 Pick a file:
                 <button onClick={handlePickFile}>...</button>
             </div>
 
-            {state?.error && (
-                <div>
-                    <span className="text-error">{state.error}</span>
+            {error && (
+                <div className="error-banner">
+                    <WarningCircleIcon />
+                    <span>{error}</span>
                 </div>
             )}
- 
-        </Layout>
+        </>
     );
 }
