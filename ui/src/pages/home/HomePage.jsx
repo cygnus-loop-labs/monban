@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { resolveResource } from "@tauri-apps/api/path";
 import { open } from "@tauri-apps/plugin-dialog";
 
-import { WarningCircleIcon } from "@phosphor-icons/react";
+import { FilePlusIcon, WarningCircleIcon } from "@phosphor-icons/react";
 
 import { useAppState } from "../../AppContext";
 
@@ -26,10 +26,12 @@ export default function HomePage() {
     }
 
     return (
-        <>
-            <div className="text-title-m">
-                Pick a file:
-                <button onClick={handlePickFile}>...</button>
+        <div className="home">
+            <div className="home__picker">
+                <button className="home__button" onClick={handlePickFile}>
+                    <FilePlusIcon />
+                    <span>Pick a file</span>
+                </button>
             </div>
 
             {error && (
@@ -38,6 +40,6 @@ export default function HomePage() {
                     <span>{error}</span>
                 </div>
             )}
-        </>
+        </div>
     );
 }

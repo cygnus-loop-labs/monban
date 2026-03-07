@@ -1,11 +1,11 @@
 import { ProgressBar } from "../../components/ui/ProgressBar";
-import { Layout } from '../../components/layouts/Layout.jsx';
 
 export default function LoadingScreen({ progress = null, message = null }) {
     return (
-        <div className="text-serif-xxl loading-progress">
-            Loading
-            <ProgressBar height="20px" width="200px" value={progress} color="var(--red)" />
+        <div className="loading">
+            <span className="loading__label">Loading</span>
+            <ProgressBar value={progress} width="240px" height="12px" color="var(--purple)" />
+            <span className="loading__progress">{progress}%</span>
         </div>
     );
 }
