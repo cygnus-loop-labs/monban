@@ -108,7 +108,7 @@
 .word-list__freq {
     font-size: var(--font-size-s);
     font-family: monospace;
-    color: var(--red);
+    color: var(--purple);
     margin-left: auto;
 }
 
@@ -160,7 +160,7 @@
 .word-row__count {
     font-size: var(--font-size-m);
     font-family: var(--font-mono);
-    color: var(--red);
+    color: var(--purple);
     text-align: right;
     font-weight: 600;
 }

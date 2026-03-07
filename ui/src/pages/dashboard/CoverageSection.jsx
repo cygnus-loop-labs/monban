@@ -44,7 +44,7 @@ export function CoverageSection({ lexicon }) {
                     label="Unknown Words"
                     value={unknown_words}
                     sub={`${unique_words} unique words`}
-                    accent="var(--red)" />
+                    accent="var(--purple)" />
                 <StatCard
                     label="Words to 95%"
                     value={missing}
