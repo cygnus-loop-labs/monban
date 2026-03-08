@@ -31,7 +31,7 @@ export default function CoverageSection({ lexicon }) {
 
             return missing;
         },
-        [words]
+        [words, total_words]
     );
 
     return (

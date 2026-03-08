@@ -19,13 +19,13 @@ export default function Dashboard() {
             console.log("Error: ", lexicon.error);
             navigate("/");
         }
-    }, [lexicon.error]);
+    }, [lexicon.error, navigate]);
 
     useEffect(() => {
         if (!lexicon.loading && !lexicon.data) {
             navigate("/");
         }
-    }, []);
+    }, [lexicon.loading, lexicon.data, navigate]);
 
     if (lexicon.loading) return <LoadingScreen progress={lexicon.progress} />;
     if (!lexicon.data) return <></>;

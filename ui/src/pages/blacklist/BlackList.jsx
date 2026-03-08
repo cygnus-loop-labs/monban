@@ -6,17 +6,14 @@ import LoadingScreen from '../loading/LoadingScreen.jsx';
 
 export default function BlackList() {
     const blacklist = useBlacklist();
-
-    if (blacklist.loading) return <LoadingScreen progress={blacklist.progress} />;
-    if (!blacklist.data) return <></>;
-
-    const words = useMemo(
-        () => blacklist.data,
-        [blacklist]
-    );
-
+    const { blacklist_remove_word } = useAppState();
     const [displayed, setDisplayed] = useState(20);
     const sentinelRef = useRef(null);
+
+    const words = useMemo(
+        () => blacklist.data ?? [],
+        [blacklist]
+    );
 
     useEffect(() => {
         const observer = new IntersectionObserver(entries => {
@@ -28,7 +25,9 @@ export default function BlackList() {
         return () => observer.disconnect();
     }, [words.length]);
 
-    const { blacklist_remove_word } = useAppState();
+    if (blacklist.loading) return <LoadingScreen progress={blacklist.progress} />;
+    if (!blacklist.data) return <></>;
+
     const handleDeleteWord = (word) => blacklist_remove_word(word);
 
     return (
