@@ -1,4 +1,4 @@
-export function StatCard({ label, value, sub, accent }) {
+export default function StatCard({ label, value, sub, accent }) {
   return (
     <div className="stat-card">
       <span className="text-label-m">

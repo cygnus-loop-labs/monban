@@ -4,11 +4,9 @@ pub mod input;
 
 pub use self::deck::{DeckLoader, JLPTDeckLoader, PlainDeckLoader, WKDeckLoader};
 
-use std::{
-    collections::{HashMap, HashSet},
-    path::Path,
-};
+use std::{collections::HashMap, path::Path};
 
+use indexmap::IndexMap;
 use lindera::{
     dictionary::load_dictionary, mode::Mode, segmenter::Segmenter, token::Token,
     tokenizer::Tokenizer,
@@ -65,17 +63,25 @@ impl Parser {
         })
     }
 
-    pub fn load_blacklist(&self, file: impl AsRef<Path>) -> Result<HashSet<String>, ParseError> {
+    pub fn load_blacklist(
+        &self,
+        file: impl AsRef<Path>,
+    ) -> Result<IndexMap<String, Word>, ParseError> {
         Ok(load_data_file(file)?
             .lines()
-            .map(|l| l.to_string())
+            .map(|l| {
+                (
+                    l.to_string(),
+                    Word::new(l.to_string(), WordCategory::Unknown),
+                )
+            })
             .collect())
     }
 
     pub fn load_text(
         &self,
         file: impl AsRef<Path>,
-        blacklist: &HashSet<String>,
+        blacklist: &IndexMap<String, Word>,
     ) -> Result<Lexicon, ParseError> {
         self.parse_content(PlainTextLoader::load(file)?, blacklist)
     }
@@ -83,7 +89,7 @@ impl Parser {
     pub fn load_epub(
         &self,
         file: impl AsRef<Path>,
-        blacklist: &HashSet<String>,
+        blacklist: &IndexMap<String, Word>,
     ) -> Result<Lexicon, ParseError> {
         self.parse_content(EpubTextLoader::load(file)?, blacklist)
     }
@@ -91,7 +97,7 @@ impl Parser {
     fn parse_content(
         &self,
         content: Vec<String>,
-        blacklist: &HashSet<String>,
+        blacklist: &IndexMap<String, Word>,
     ) -> Result<Lexicon, ParseError> {
         let mut tokens: Vec<Token> = vec![];
 
@@ -137,15 +143,17 @@ impl Parser {
                         "Category no found: {}: {}/{}", word, cat, subcat);
                 }
 
-                Word::new(word, word_cat)
+                let mut word = Word::new(word, word_cat);
+
+                if blacklist.contains_key(&word.word) {
+                    word.filter = true;
+                }
+
+                word
             })
             .filter(|word| {
                 if self.dict.words.contains(&word.word) {
-                    if blacklist.contains(&word.word) {
-                        false
-                    } else {
-                        self.filter.filter(word)
-                    }
+                    self.filter.filter(word)
                 } else {
                     false
                 }

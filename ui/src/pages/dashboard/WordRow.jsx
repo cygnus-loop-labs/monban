@@ -1,6 +1,6 @@
 import { TrashIcon } from "@phosphor-icons/react";
 
-export function WordRow({ word, rank, onDelete }) {
+export default function WordRow({ word, rank, onDelete }) {
     return (
         <div className="word-row"
             onMouseEnter={e => e.currentTarget.style.background = "var(--border)"}

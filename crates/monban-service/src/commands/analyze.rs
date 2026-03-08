@@ -3,7 +3,15 @@ use std::path::Path;
 use crate::parsing::{
     DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader, WKDeckLoader,
 };
-use monban_core::{Config, Deck, Lexicon};
+use monban_core::{Config, Deck, Lexicon, Word};
+
+pub fn cmd_get_blacklist(config: &Config) -> Result<Vec<Word>, ParseError> {
+    let parser = Parser::new(config)?;
+
+    let blacklist = parser.load_blacklist(&config.parser.blacklist)?;
+
+    Ok(blacklist.into_values().collect())
+}
 
 pub fn cmd_analyze<F>(
     config: &Config,
@@ -14,41 +22,57 @@ pub fn cmd_analyze<F>(
 where
     F: Fn(u32),
 {
-    on_progress(0);
+    let mut progress = 0;
+
+    on_progress(progress);
 
     let parser = Parser::new(config)?;
 
     let blacklist = parser.load_blacklist(&config.parser.blacklist)?;
 
-    on_progress(10);
+    progress = 10;
+    on_progress(progress);
 
     let mut lexicon = match ty {
         InputType::Txt => parser.load_text(input, &blacklist),
         InputType::Epub => parser.load_epub(input, &blacklist),
     }?;
 
-    on_progress(20);
+    progress = 20;
+    on_progress(progress);
 
-    let decks = &mut config
-        .decks
+    let deck_list = &config.decks;
+    let n_decks = deck_list.keys().len();
+
+    let deck_progress = 30 / n_decks;
+
+    let mut decks = deck_list
         .iter()
-        .map(|(name, params)| match params.ty.as_str() {
-            "plain" => PlainDeckLoader::load(name.to_string(), &params.file, config),
-            "wk" => WKDeckLoader::load(name.to_string(), &params.file, config),
-            "jlpt" => JLPTDeckLoader::load(name.to_string(), &params.file, config),
-            _ => unimplemented!(),
+        .map(|(name, params)| {
+            progress += deck_progress as u32;
+            on_progress(progress);
+            match params.ty.as_str() {
+                "plain" => PlainDeckLoader::load(name.to_string(), &params.file, config),
+                "wk" => WKDeckLoader::load(name.to_string(), &params.file, config),
+                "jlpt" => JLPTDeckLoader::load(name.to_string(), &params.file, config),
+                _ => unimplemented!(),
+            }
         })
         .collect::<Result<Vec<Deck>, ParseError>>()?;
 
-    on_progress(50);
+    progress = 60;
+    on_progress(progress);
 
-    for word in lexicon.iter_mut() {
-        for deck in decks.iter_mut() {
+    for deck in decks.iter_mut() {
+        progress += deck_progress as u32;
+        on_progress(progress);
+        for word in lexicon.iter_mut() {
             deck.check(word);
         }
     }
 
-    on_progress(100);
+    progress = 100;
+    on_progress(progress);
 
     Ok(lexicon)
 }

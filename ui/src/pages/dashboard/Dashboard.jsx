@@ -1,33 +1,39 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { CoverageSection } from './CoverageSection.jsx';
-import { WordList } from './WordList.jsx';
-import LoadingScreen from '../../pages/loading/LoadingScreen.jsx';
 import { useAppState, useLexicon } from '../../AppContext.jsx';
+import CoverageSection from './CoverageSection.jsx';
+import LoadingScreen from '../loading/LoadingScreen.jsx';
+import WordList from './WordList.jsx';
 
 export default function Dashboard() {
     const navigate = useNavigate();
 
-    const { deleteWord, loading, progress, error } = useAppState();
+    const { blacklist_add_word } = useAppState();
     const lexicon = useLexicon();
 
-    const handleDeleteWord = (word) => deleteWord(word);
+    const handleDeleteWord = (word) => blacklist_add_word(word);
 
     useEffect(() => {
-        if (error) {
-            console.log("Error: ", error);
+        if (lexicon.error) {
+            console.log("Error: ", lexicon.error);
             navigate("/");
         }
-    }, [error]);
+    }, [lexicon.error]);
 
-    if (loading) return <LoadingScreen progress={progress} />;
-    if (!lexicon) return <></>;
+    useEffect(() => {
+        if (!lexicon.loading && !lexicon.data) {
+            navigate("/");
+        }
+    }, []);
+
+    if (lexicon.loading) return <LoadingScreen progress={lexicon.progress} />;
+    if (!lexicon.data) return <></>;
 
     return (
         <div>
-            <CoverageSection lexicon={lexicon} />
-            <WordList lexicon={lexicon} onDeleteWord={handleDeleteWord} />
+            <CoverageSection lexicon={lexicon.data} />
+            <WordList lexicon={lexicon.data} onDeleteWord={handleDeleteWord} />
         </div>
     );
 }

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import { WordRow } from "./WordRow.jsx";
+import WordRow from "./WordRow.jsx";
 
-export function WordList({ lexicon, onDeleteWord }) {
+export default function WordList({ lexicon, onDeleteWord }) {
     const words = useMemo(
         () => Object.values(lexicon.words).filter(w => !w.learned && !w.filter).sort((a, b) => b.count - a.count),
         [lexicon]

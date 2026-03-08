@@ -4,12 +4,12 @@ use std::sync::{Arc, Mutex};
 
 use tauri::Manager;
 
-use crate::commands::{AppState, analyze};
+use crate::commands::{AppState, analyze, get_blacklist};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![analyze])
+        .invoke_handler(tauri::generate_handler![analyze, get_blacklist])
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let state = Arc::new(Mutex::new(AppState::new()));

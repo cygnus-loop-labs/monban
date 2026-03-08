@@ -1,7 +1,7 @@
-import { Header } from "./Header.jsx";
-import { Sidebar } from "./Sidebar.jsx";
+import Header from "./Header.jsx";
+import Sidebar from "./Sidebar.jsx";
 
-export function Layout({ children }) {
+export default function Layout({ children }) {
     return (
         <div className="layout">
             <Header />

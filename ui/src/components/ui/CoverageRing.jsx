@@ -1,4 +1,4 @@
-export function CoverageRing({ coverage }) {
+export default function CoverageRing({ coverage }) {
   const r = 68;
     const circ = 2 * Math.PI * r;
     const dash = (coverage / 100) * circ;

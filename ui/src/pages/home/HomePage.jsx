@@ -5,10 +5,11 @@ import { open } from "@tauri-apps/plugin-dialog";
 
 import { FilePlusIcon, WarningCircleIcon } from "@phosphor-icons/react";
 
-import { useAppState } from "../../AppContext";
+import { useAppState, useLexicon } from "../../AppContext";
 
 export default function HomePage() {
-    const { analyze, error } = useAppState();
+    const { analyze } = useAppState();
+    const lexicon = useLexicon();
     const navigate = useNavigate();
 
     async function handlePickFile() {
@@ -34,10 +35,10 @@ export default function HomePage() {
                 </button>
             </div>
 
-            {error && (
+            {lexicon.error && (
                 <div className="error-banner">
                     <WarningCircleIcon />
-                    <span>{error}</span>
+                    <span>{lexicon.error}</span>
                 </div>
             )}
         </div>

@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 dirs = { workspace = true }
 epub = { workspace = true }
+indexmap = { workspace = true }
 lindera = { workspace = true }
 monban-core = { path = "../monban-core/" }
 scraper = { workspace = true }

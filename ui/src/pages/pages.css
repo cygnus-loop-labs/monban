@@ -175,20 +175,98 @@
 }
 
 .word-row__blacklist {
-    font-size: var(--font-size-s);
-    padding: 0px 0px;
-    width: 24px;
-    height: 24px;
-    border: 1px solid var(--border);
-    background: transparent;
-    border-color: var(--label);
-    color: var(--label);
-    border-radius: 4px;
+    background: none;
+    border: none;
     cursor: pointer;
+    color: var(--subtle);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease;
 }
 
 .word-row__blacklist:hover {
-    border-color: var(--red);
     color: var(--red);
 }
 
+.word-row__blacklist svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.blacklist-list {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.blacklist-list__header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.blacklist-list__content {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.blacklist-row {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 2rem;
+    align-items: center;
+    height: 45px;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s ease;
+}
+
+.blacklist-row__index {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-m);
+    color: var(--label);
+}
+
+.blacklist-row__word {
+    font-family: var(--font-serif);
+    font-size: var(--font-size-l);
+    color: var(--text);
+}
+
+.blacklist-row__actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.blacklist-row__remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--subtle);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease;
+}
+
+.blacklist-row__remove svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.blacklist-row__remove:hover {
+    color: var(--red);
+}
+
+.blacklist-row__trash {
+    width: 16px;
+    height: 16px;
+}

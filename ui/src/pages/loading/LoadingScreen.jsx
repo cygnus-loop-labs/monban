@@ -1,4 +1,4 @@
-import { ProgressBar } from "../../components/ui/ProgressBar";
+import ProgressBar from "../../components/ui/ProgressBar";
 
 export default function LoadingScreen({ progress = null, message = null }) {
     return (

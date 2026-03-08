@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { ChartBarIcon, FileTextIcon, TrashSimpleIcon, GearIcon } from "@phosphor-icons/react";
 
-export function Sidebar() {
+export default function Sidebar() {
     const navigate = useNavigate();
 
     return (
@@ -13,7 +13,7 @@ export function Sidebar() {
             <button className = "sidebar__item" onClick={() => navigate("/") }>
                 <FileTextIcon />
             </button>
-            <button className = "sidebar__item" onClick={() => navigate("/") }>
+            <button className = "sidebar__item" onClick={() => navigate("/blacklist") }>
                 <TrashSimpleIcon />
             </button>
             <button className = "sidebar__item" onClick={() => navigate("/") }>
