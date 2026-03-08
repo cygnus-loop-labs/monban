@@ -1,7 +1,7 @@
 use std::{io::stdout, path::PathBuf};
 
 use anyhow::Result;
-use clap::{Parser as ClapParser, ValueEnum};
+use clap::{Parser as ClapParser, Subcommand, ValueEnum};
 use serde_json::json;
 
 use monban_core::Config;
@@ -27,28 +27,40 @@ impl From<CliInputType> for InputType {
 
 #[derive(ClapParser)]
 struct Cli {
-    #[arg(short, long, required = true)]
-    input: PathBuf,
-    #[arg(
-        short,
-        long = "type",
-        required = true,
-        value_enum,
-        value_name = "txt|epub"
-    )]
-    ty: CliInputType,
-    #[arg(short, long)]
-    blacklist: Option<String>,
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    Analyze {
+        #[arg(short, long, required = true)]
+        input: PathBuf,
+        #[arg(
+            short,
+            long = "type",
+            required = true,
+            value_enum,
+            value_name = "txt|epub"
+        )]
+        ty: CliInputType,
+    },
 }
 
 fn main() -> Result<()> {
     init_logger();
 
-    let config = Config::load();
-
     let cli = Cli::parse();
 
-    let lexicon = cmd_analyze(&config, &cli.input, cli.ty.into(), |p| {
+    match cli.command {
+        Commands::Analyze { input, ty } => analyze(input, ty),
+    }
+}
+
+fn analyze(input: PathBuf, ty: CliInputType) -> Result<()> {
+    let config = Config::load();
+
+    let lexicon = cmd_analyze(&config, input, ty.into(), |p| {
         tracing::info!("Analysis progress: {}", p);
     })?;
 
