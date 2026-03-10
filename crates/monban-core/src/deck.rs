@@ -1,9 +1,26 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use crate::{Kanji, Word};
+use serde::Serialize;
+
+use crate::{Kanji, Word, WordCategory};
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+pub struct DeckEntry {
+    pub word: String,
+    pub reading: String,
+    pub cat: WordCategory,
+    pub learned: bool,
+    pub tags: HashSet<String>,
+}
+
+impl DeckEntry {
+    pub fn tag(&mut self, tag: String) {
+        self.tags.insert(tag);
+    }
+}
 
 pub struct Deck {
-    words: HashMap<String, Word>,
+    words: HashMap<String, DeckEntry>,
     kanji: HashMap<String, Kanji>,
 }
 
@@ -15,8 +32,14 @@ impl Deck {
         }
     }
 
-    pub fn add_word(&mut self, word: Word) {
-        self.words.insert(word.word.clone(), word);
+    pub fn add_word(&mut self, word: String, reading: String, cat: WordCategory) -> &mut DeckEntry {
+        self.words.entry(word.clone()).or_insert(DeckEntry {
+            word,
+            reading,
+            cat,
+            learned: false,
+            tags: Default::default(),
+        })
     }
 
     pub fn add_kanji(&mut self, kanji: Kanji) {

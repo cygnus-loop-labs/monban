@@ -6,7 +6,9 @@ use serde_json::json;
 
 use monban_core::Config;
 use monban_service::{
-    analysis::analyzer::WordAnalyzer, commands::analyze::cmd_analyze, parsing::InputType,
+    analysis::analyzer::WordAnalyzer,
+    commands::analyze::cmd_analyze,
+    parsing::{InputType, deck::AnkiDeckLoader},
     util::init_logger,
 };
 
@@ -45,15 +47,18 @@ enum Commands {
         )]
         ty: CliInputType,
     },
+    Anki {},
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     init_logger();
 
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Analyze { input, ty } => analyze(input, ty),
+        Commands::Anki {} => anki().await,
     }
 }
 
@@ -71,6 +76,19 @@ fn analyze(input: PathBuf, ty: CliInputType) -> Result<()> {
     let output = json!({"stats": stats, "lexicon": lexicon});
 
     serde_json::to_writer_pretty(stdout(), &output).expect("Cannot export words");
+
+    Ok(())
+}
+
+async fn anki() -> Result<()> {
+    let config = Config::load();
+
+    let decks = AnkiDeckLoader::list_decks(&config).await?;
+
+    tracing::info!("Decks: {}", decks.len());
+    for deck in &decks {
+        tracing::info!("Deck: {:?}", deck);
+    }
 
     Ok(())
 }

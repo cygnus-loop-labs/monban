@@ -2,7 +2,7 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use monban_core::{Config, Deck, DictionaryItem, Kanji, Word, WordCategory};
+use monban_core::{Config, Deck, DictionaryItem, Kanji, WordCategory};
 
 use crate::{
     parsing::{DeckLoader, ParseError},
@@ -42,9 +42,12 @@ impl DeckLoader for WKDeckLoader {
         }
 
         for entry in &entries.vocabulary {
-            let mut word = Word::new(entry.characters.clone(), WordCategory::Unknown);
-            word.tag(format!("{}={}", &name, entry.level));
-            deck.add_word(word);
+            let deck_entry = deck.add_word(
+                entry.characters.clone(),
+                entry.readings[0].clone(),
+                WordCategory::Unknown,
+            );
+            deck_entry.tag(format!("{}={}", &name, entry.level));
         }
 
         Ok(deck)

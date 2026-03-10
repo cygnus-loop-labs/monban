@@ -2,7 +2,7 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
+use monban_core::{Config, Deck, WordCategory};
 
 use crate::{
     parsing::{DeckLoader, ParseError},
@@ -44,17 +44,19 @@ impl DeckLoader for JLPTDeckLoader {
         let mut deck = Deck::new();
 
         for entry in &entries.vocabulary {
-            let mut word = Word::new(entry.word.clone(), WordCategory::Unknown);
-            word.tag(format!("{}={:?}", &name, entry.level));
+            let deck_entry = deck.add_word(
+                entry.word.clone(),
+                entry.reading.clone(),
+                WordCategory::Unknown,
+            );
+            deck_entry.tag(format!("{}={:?}", &name, entry.level));
             match entry.level {
-                JLPTLevel::N1 => word.learned = false,
-                JLPTLevel::N2 => word.learned = false,
-                JLPTLevel::N3 => word.learned = false,
-                JLPTLevel::N4 => word.learned = true,
-                JLPTLevel::N5 => word.learned = true,
+                JLPTLevel::N1 => deck_entry.learned = false,
+                JLPTLevel::N2 => deck_entry.learned = false,
+                JLPTLevel::N3 => deck_entry.learned = false,
+                JLPTLevel::N4 => deck_entry.learned = true,
+                JLPTLevel::N5 => deck_entry.learned = true,
             }
-
-            deck.add_word(word);
         }
 
         Ok(deck)

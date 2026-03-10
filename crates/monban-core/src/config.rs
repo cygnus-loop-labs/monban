@@ -13,6 +13,7 @@ pub struct Config {
     pub dictionary: DictionaryConfig,
     pub parser: ParserConfig,
     pub decks: HashMap<String, DeckConfig>,
+    pub anki: AnkiConfig,
 }
 
 impl Config {
@@ -47,4 +48,9 @@ pub struct DeckConfig {
     pub file: String,
     #[serde(rename = "type")]
     pub ty: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AnkiConfig {
+    pub url: String,
 }

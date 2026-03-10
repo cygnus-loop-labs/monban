@@ -15,6 +15,7 @@ dirs = "6.0"
 epub = "2.1"
 indexmap = { version="2.13", features= ["serde"] }
 lindera = { version = "2.2.0", features = ["embed-ipadic"] }
+reqwest = { version = "0.13", features = ["json"] }
 scraper = "0.25"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -23,6 +24,7 @@ tauri-build = { version = "2.5", features = [] }
 tauri-plugin-dialog = "2.6"
 tauri-plugin-log = "2.8"
 thiserror = "2.0"
+tokio = { version = "1.50", features = ["rt-multi-thread"] }
 toml = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

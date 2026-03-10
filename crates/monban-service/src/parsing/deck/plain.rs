@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use monban_core::{Config, Deck, DictionaryItem as _, Word, WordCategory};
+use monban_core::{Config, Deck, WordCategory};
 
 use crate::{
     parsing::{DeckLoader, ParseError},
@@ -18,11 +18,9 @@ impl DeckLoader for PlainDeckLoader {
         let words: Vec<String> = serde_json::from_str(&content).unwrap();
 
         for word in words {
-            let mut word = Word::new(word, WordCategory::Unknown);
-            word.tag(name.clone());
-            word.learned = true;
-
-            deck.add_word(word);
+            let deck_entry = deck.add_word(word.clone(), word, WordCategory::Unknown);
+            deck_entry.tag(name.clone());
+            deck_entry.learned = true;
         }
 
         Ok(deck)
