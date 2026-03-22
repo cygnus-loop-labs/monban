@@ -1,5 +1,7 @@
+import { RingProgress, Stack, Text } from "@mantine/core";
+
 export default function CoverageRing({ coverage }) {
-  const r = 68;
+    const r = 68;
     const circ = 2 * Math.PI * r;
     const dash = (coverage / 100) * circ;
 
@@ -14,23 +16,17 @@ export default function CoverageRing({ coverage }) {
     const diff = DIFFICULTY.find(d => coverage >= d.min) || DIFFICULTY[DIFFICULTY.length - 1];
 
     return (
-        <div className="coverage-ring">
-            <svg width="160" height="160" viewBox="0 0 160 160">
-                <circle className="coverage-ring__track" cx="80" cy="80" r={r} />
-                <circle className="coverage-ring__progress" cx="80" cy="80" r={r}
-                    stroke={diff.color}
-                    strokeDasharray={`${dash} ${circ}`}
-                    transform="rotate(-90 80 80)"
-                />
-            </svg>
-            <div className="coverage-ring__content">
-                <span className="coverage-ring__coverage" style={{ color: diff.color }}>
-                    {coverage.toFixed(1)}%
-                </span>
-                <span className="coverage-ring__label">
-                    {diff.label}
-                </span>
-            </div>
-        </div>
+        <RingProgress
+            size={160}
+            thickness={8}
+            roundCaps
+            sections={[{value: coverage, color: diff.color}]}
+            label={
+                <Stack gap={2} align="center">
+                    <Text fw={700} size="var(--font-size-xl)" c={diff.color}>{coverage.toFixed(1)}%</Text>
+                    <Text size="var(--font-size-m)" c="var(--label)">{diff.label}</Text>
+                </Stack>
+            }
+        />
     );
 }

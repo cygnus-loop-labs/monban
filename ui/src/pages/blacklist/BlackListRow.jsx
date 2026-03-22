@@ -1,22 +1,20 @@
+import { ActionIcon, Badge, Table, Text } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react";
 
 export default function BlackListRow({ word, rank, onDelete }) {
     return (
-        <div className="blacklist-row"
-            onMouseEnter={e => e.currentTarget.style.background = "var(--border)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-            <span className="blacklist-row__index">
-                {String(rank).padStart(2, "0")}
-            </span>
-            <span className="blacklist-row__word">
-                {word.word}
-            </span>
-            <div className="blacklist-row__actions">
-                <button className="blacklist-row__remove" onClick={() => onDelete(word)}>
-                    <TrashIcon className="blacklist-row__trash"/>
-                </button>
-            </div>
-        </div>
+        <Table.Tr>
+            <Table.Td>
+                <Text size="var(--font-size-m)" c="var(--label)">{String(rank).padStart(2, "0")}</Text>
+            </Table.Td>
+            <Table.Td>
+                <Text ff="var(--font-serif)" size="var(--font-size-l)">{word.word}</Text>
+            </Table.Td>
+            <Table.Td>
+                    <ActionIcon variant="subtle" color="var(--red)" onClick={() => onDelete(word)}>
+                        <TrashIcon />
+                    </ActionIcon>
+            </Table.Td>
+        </Table.Tr>
     );
 }

@@ -7,62 +7,48 @@ body {
     margin: 0;
 }
 
-.loading {
-    background: var(--bg);
+.mantine-AppShell-root,
+.mantine-AppShell-header,
+.mantine-AppShell-navbar {
+    background-color: var(--bg);
+}
+
+.mantine-Table-table {
+    --table-highlight-on-hover-color: var(--subtle);
+}
+
+.mantine-Button-root {
+    --button-bg: transparent;
+    --button-hover: var(--purple);
+    border-color: var(--purple);
+    color: var(--text);
+    --button-hover-color: var(--bg);
+}
+
+.mantine-ActionIcon-root {
+    color: var(--text);
+    --ai-bg: var(--bg);
+    --ai-hover: var(--subtle);
+}
+
+.mantine-Badge-root {
+    background-color: var(--subtle);
     color: var(--text);
 }
 
-.text-serif-xxl {
-    font-size: var(--font-size-xxl);
-    font-family: var(--font-serif);
-    font-weight: 700;
+.mantine-Table-tr:hover .mantine-Badge-root {
+    background-color: var(--bg);
 }
 
-.text-title-m {
-    font-size: var(--font-size-m);
-    font-family: var(--font-mono);
-    color: var(--label);
-    letter-spacing: 1px;
+.mantine-Card-root {
+    background-color: var(--bg-card);
+    border-radius: 8px;
 }
 
-.text-title-s {
-    font-size: var(--font-size-s);
-    font-family: var(--font-mono);
-    color: var(--label);
-    letter-spacing: 1px;
-}
-
-.text-label-m {
-    font-size: var(--font-size-m);
-    font-family: var(--font-mono);
-    color: var(--label);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.text-label-s {
-    font-size: var(--font-size-m);
-    font-family: var(--font-mono);
-    color: var(--label);
-    letter-spacing: 1px;
-}
-
-.error-banner {
-    font-size: var(--font-size-m);
-    font-family: var(--font-serif);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    margin-top: 24px;
-    background: color-mix(in srgb, var(--red) 12%, transparent);
-    border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
-    border-radius: 6px;
-    color: var(--red);
-}
-
-.error-banner svg {
-    width: 24px;
-    height: 24px;
-    flex-shrink: 0;
+.coverage-section__ring {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 18px;
+    align-self: stretch;
+    justify-content: center;
 }

@@ -1,13 +1,11 @@
+import { Card, Text } from '@mantine/core';
+
 export default function StatCard({ label, value, sub, accent }) {
   return (
-    <div className="stat-card">
-      <span className="text-label-m">
-        {label}
-      </span>
-      <span className="stat-card__value" style={{ color: accent || "var(--text)" }}>
-        {value}
-      </span>
-      {sub && <span className="stat-card__sub">{sub}</span>}
-    </div>
+    <Card>
+      <Text size="xl" c="var(--label)">{label}</Text>
+      <Text size="xl" c={accent} fw={700}>{value}</Text>
+      {sub && <Text size="sm" c="var(--subtle)">{sub}</Text>}
+    </Card>
   );
 }

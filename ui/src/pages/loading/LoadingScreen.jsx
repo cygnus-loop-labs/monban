@@ -1,11 +1,13 @@
-import ProgressBar from "../../components/ui/ProgressBar";
+import { Center, Stack, Progress, Text } from "@mantine/core";
 
 export default function LoadingScreen({ progress = null, message = null }) {
     return (
-        <div className="loading">
-            <span className="loading__label">Loading</span>
-            <ProgressBar value={progress} width="240px" height="12px" color="var(--purple)" />
-            <span className="loading__progress">{progress}%</span>
-        </div>
+        <Center h="100%">
+            <Stack align="center" w={240}>
+                <Text size="sm">Loading</Text>
+                <Progress value={progress ?? 0} w="100%" color="var(--purple)" />
+                <Text size="sm">{progress}%</Text>
+            </Stack>
+        </Center>
     );
 }

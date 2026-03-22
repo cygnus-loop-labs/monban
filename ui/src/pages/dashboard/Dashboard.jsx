@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { Stack } from '@mantine/core';
+
 import { useAppState, useLexicon } from '../../AppContext.jsx';
 import CoverageSection from './CoverageSection.jsx';
 import LoadingScreen from '../loading/LoadingScreen.jsx';
@@ -31,9 +33,9 @@ export default function Dashboard() {
     if (!lexicon.data) return <></>;
 
     return (
-        <div>
+        <Stack>
             <CoverageSection lexicon={lexicon.data} />
             <WordList lexicon={lexicon.data} onDeleteWord={handleDeleteWord} />
-        </div>
+        </Stack>
     );
 }

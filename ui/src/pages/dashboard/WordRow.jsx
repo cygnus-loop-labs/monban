@@ -1,33 +1,29 @@
+import { ActionIcon, Badge, Table, Text } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react";
 
 export default function WordRow({ word, rank, onDelete }) {
     return (
-        <div className="word-row"
-            onMouseEnter={e => e.currentTarget.style.background = "var(--border)"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-        >
-            <span className="word-row__index">
-                {String(rank).padStart(2, "0")}
-            </span>
-            <span className="word-row__word">
-                {word.word}
-            </span>
-            <span className="word-row__cat">
-                {word.cat}
-            </span>
-            <div className="word-row__tags">
-                {word.tags.map(t => (
-                    <span key={t} className="word-row__tag">{t}</span>
-                ))}
-            </div>
-            <span className="word-row__count">
-                ×{word.count}
-            </span>
-            <div className="word-row__actions">
-                <button className="word-row__blacklist" onClick={() => onDelete(word)}>
-                    <TrashIcon className="word-row__trash"/>
-                </button>
-            </div>
-        </div>
+        <Table.Tr>
+            <Table.Td>
+                <Text size="var(--font-size-m)" c="var(--label)">{String(rank).padStart(2, "0")}</Text>
+            </Table.Td>
+            <Table.Td>
+                <Text ff="var(--font-serif)" size="var(--font-size-l)">{word.word}</Text>
+            </Table.Td>
+            <Table.Td>
+                <Text size="var(--font-size-s)" c="var(--label)">{word.cat}</Text>
+            </Table.Td>
+            <Table.Td>
+                {word.tags.map(t => (<Badge key={t} size="sm">{t}</Badge>))}
+            </Table.Td>
+            <Table.Td>
+                <Text size="var(--font-size-s)">×{word.count}</Text>
+            </Table.Td>
+            <Table.Td>
+                <ActionIcon variant="subtle" color="var(--red)" onClick={() => onDelete(word)}>
+                    <TrashIcon />
+                </ActionIcon>
+            </Table.Td>
+        </Table.Tr>
     );
 }

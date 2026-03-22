@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { Group, Table, Text } from "@mantine/core";
+
 import WordRow from "./WordRow.jsx";
 
 export default function WordList({ lexicon, onDeleteWord }) {
@@ -13,18 +15,22 @@ export default function WordList({ lexicon, onDeleteWord }) {
     }
 
     return (
-        <div className="word-list">
-            <div className="word-list__header">
-                <span className="text-label-m">
-                    Priority vocabulary
-                </span>
-                <span className="word-list__freq">
-                    sorted by frequency
-                </span>
-            </div>
-            {words.slice(0, 15).map((w, i) => (
-                <WordRow key={w.word} word={w} rank={i + 1} onDelete={handleDelete} />
-            ))}
-        </div>
+        <Table highlightOnHover>
+            <Table.Thead>
+                <Table.Tr>
+                    <Table.Th colSpan={6}>
+                        <Group justify="space-between">
+                            <Text size="sm" fw={600}>Priority vocabulary</Text>
+                            <Text size="xs" c="dimmed">sorted by frequency</Text>
+                        </Group>
+                    </Table.Th>
+                </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+                {words.slice(0, 15).map((w, i) => (
+                    <WordRow key={w.word} word={w} rank={i + 1} onDelete={handleDelete} />
+                ))}
+            </Table.Tbody>
+        </Table>
     );
 }

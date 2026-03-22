@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 
+import { Group, SimpleGrid, Stack, Text } from "@mantine/core";
+
 import CoverageRing from "../../components/ui/CoverageRing.jsx";
 import StatCard from "../../components/ui/StatCard.jsx";
 
@@ -35,12 +37,12 @@ export default function CoverageSection({ lexicon }) {
     );
 
     return (
-        <div className="coverage-section">
-            <div className="coverage-section__score">
+        <Group align="flex-start" gap="xl">
+            <Stack className="coverage-section__ring" align="center" gap={4}>
                 <CoverageRing coverage={coverage} />
-                <span className="text-label-m">Coverage</span>
-            </div>
-            <div className="coverage-section__cards">
+                <Text size="xl" c="var(--label)">Coverage</Text>
+            </Stack>
+            <SimpleGrid cols={2} spacing="md" style={{flex: 1}}>
                 <StatCard
                     label="Unknown Words"
                     value={unknown_words}
@@ -59,7 +61,7 @@ export default function CoverageSection({ lexicon }) {
                     label="Total Word"
                     value={total_words}
                     sub={`${tokens} tokens`} />
-            </div>
-        </div>
+            </SimpleGrid>
+        </Group>
     );
 }
