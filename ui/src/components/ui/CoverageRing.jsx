@@ -22,7 +22,7 @@ export default function CoverageRing({ coverage }) {
             roundCaps
             sections={[{value: coverage, color: diff.color}]}
             label={
-                <Stack gap={2} align="center">
+                <Stack gap={8} align="center">
                     <Text fw={700} size="var(--font-size-xl)" c={diff.color}>{coverage.toFixed(1)}%</Text>
                     <Text size="var(--font-size-m)" c="var(--label)">{diff.label}</Text>
                 </Stack>
