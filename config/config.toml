@@ -1,5 +1,5 @@
 [dictionary]
-words = "dict/jmdict-full.json"
+words = "dict/jmdict-full.json.gz"
 kanji = "dict/kanji.json"
 
 [parser]

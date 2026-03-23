@@ -13,10 +13,11 @@ clap = { version = "4.5", features = ["derive"] }
 config = "0.15"
 dirs = "6.0"
 epub = "2.1"
+flate2 = "1.1"
 indexmap = { version="2.13", features= ["serde"] }
 lindera = { version = "2.2.0", features = ["embed-ipadic"] }
 reqwest = { version = "0.13", features = ["json"] }
-scraper = "0.25"
+scraper = "0.26"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tauri = { version = "2.10", features = [] }

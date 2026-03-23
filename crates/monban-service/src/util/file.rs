@@ -1,8 +1,11 @@
 use std::{
-    fs,
-    io::ErrorKind,
+    ffi::OsStr,
+    fs::File,
+    io::{BufReader, ErrorKind, Read},
     path::{Path, PathBuf},
 };
+
+use flate2::bufread::GzDecoder;
 
 use crate::parsing::ParseError;
 
@@ -38,12 +41,23 @@ pub fn load_file(root_dir: impl AsRef<Path>, path: impl AsRef<Path>) -> Result<S
         root_dir.join(path)
     };
 
-    tracing::info!(target: "Parser", "Load file: {:?}", path);
-
-    fs::read_to_string(&path)
+    let file = File::open(&path)
         .inspect_err(|e| tracing::error!(target: "Parser", "Error reading file: {}", e.to_string()))
         .map_err(|e| match e.kind() {
             ErrorKind::NotFound => ParseError::FileNotFound(path.to_string_lossy().to_string()),
             _ => ParseError::InvalidFileFormat(path.to_string_lossy().to_string()),
-        })
+        })?;
+
+    tracing::info!(target: "Parser", "Load file: {:?}", path);
+
+    let mut s = String::new();
+
+    if path.extension() == Some(OsStr::new("gz")) {
+        GzDecoder::new(BufReader::new(file)).read_to_string(&mut s)
+    } else {
+        BufReader::new(file).read_to_string(&mut s)
+    }
+    .map_err(|_| ParseError::InvalidFileFormat(path.to_string_lossy().to_string()))?;
+
+    Ok(s)
 }
