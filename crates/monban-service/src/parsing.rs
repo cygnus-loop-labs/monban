@@ -15,12 +15,13 @@ use lindera::{
 use monban_core::{Config, Lexicon, Word, WordCategory};
 use thiserror::Error;
 
-use crate::{analysis::filtering::WordFilter, util::load_data_file};
-
-use self::{
-    dict::JMDict,
-    input::{EpubTextLoader, PlainTextLoader},
+use crate::{
+    analysis::filtering::WordFilter,
+    parsing::dict::{Dict, JMDictLoader},
+    util::load_data_file,
 };
+
+use self::input::{EpubTextLoader, PlainTextLoader};
 
 const DETAILS_CATEGORY: usize = 0;
 const DETAILS_SUBCATEGORY1: usize = 1;
@@ -44,7 +45,7 @@ pub enum ParseError {
 
 pub struct Parser {
     tokenizer: Tokenizer,
-    dict: JMDict,
+    dict: Dict,
     filter: WordFilter,
     mapper: HashMap<WordCategory, Vec<(String, String)>>,
 }
@@ -52,8 +53,7 @@ pub struct Parser {
 impl Parser {
     pub fn new(config: &Config) -> Result<Self, ParseError> {
         let ipadic = load_dictionary(&config.parser.dictionary).unwrap();
-        let mut dict = JMDict::new();
-        dict.load(&config.dictionary.words, &config.dictionary.kanji)?;
+        let dict = JMDictLoader::load(&config.dictionary.words, &config.dictionary.kanji)?;
 
         Ok(Self {
             tokenizer: Tokenizer::new(Segmenter::new(Mode::Normal, ipadic, None)),
@@ -152,7 +152,7 @@ impl Parser {
                 word
             })
             .filter(|word| {
-                if self.dict.words.contains(&word.word) {
+                if self.dict.words.contains_key(&word.word) {
                     self.filter.filter(word)
                 } else {
                     false
@@ -165,7 +165,7 @@ impl Parser {
 
         for word in words {
             for c in word.word.chars() {
-                if self.dict.kanji.contains(&c) {
+                if self.dict.kanji.contains_key(&c) {
                     lex.add_kanji(c);
                 }
             }
