@@ -23,9 +23,18 @@ use crate::{
 
 use self::input::{EpubTextLoader, PlainTextLoader};
 
-const DETAILS_CATEGORY: usize = 0;
-const DETAILS_SUBCATEGORY1: usize = 1;
-const DETAILS_BASE: usize = 6;
+#[allow(unused)]
+enum TokenDetails {
+    Category = 0,
+    Subcategory1 = 1,
+    Subcategory2 = 2,
+    Subcategory3 = 3,
+    ConjugationType = 4,
+    ConjugationForm = 5,
+    Base = 6,
+    Reading = 7,
+    Pronunciation = 8,
+}
 
 #[derive(Debug, Clone)]
 pub enum InputType {
@@ -94,6 +103,41 @@ impl Parser {
         self.parse_content(EpubTextLoader::load(file)?, blacklist)
     }
 
+    fn parse_token(&self, token: &mut Token) -> Word {
+        let surface = token.surface.trim().to_string();
+        let details = token.details();
+
+        let word = if details[TokenDetails::Base as usize] == "*" {
+            surface
+        } else {
+            details[TokenDetails::Base as usize].to_string()
+        };
+
+        let cat = details[TokenDetails::Category as usize].to_string();
+        let subcat = details[TokenDetails::Subcategory1 as usize].to_string();
+
+        let word_cat = {
+            let mut word_cat = WordCategory::Unknown;
+            'outer: for (c, patterns) in &self.mapper {
+                for pattern in patterns {
+                    if pattern.0 == cat && (pattern.1 == subcat || pattern.1 == "*") {
+                        word_cat = *c;
+                        break 'outer;
+                    }
+                }
+            }
+
+            word_cat
+        };
+
+        if word_cat == WordCategory::Unknown {
+            tracing::debug!(target: "Parser",
+                "Category no found: {}: {}/{}", word, cat, subcat);
+        }
+
+        Word::new(word, word_cat)
+    }
+
     fn parse_content(
         &self,
         content: Vec<String>,
@@ -105,67 +149,47 @@ impl Parser {
             tokens.append(&mut self.tokenizer.tokenize(&content[i]).unwrap());
         });
 
-        // 0-3: category, sub cat1, sub cat 2, sub cat 3
-        // 4-5: conjugation
-        // 6-8: base, reading, pronunciation
+        let mut no_match = 0;
+        let mut filtered = 0;
+        let mut blacklisted = 0;
 
         let words = tokens
             .iter_mut()
             .map(|token| {
-                let surface = token.surface.trim().to_string();
-                let details = token.details();
+                let mut word = self.parse_token(token);
 
-                let word = if details[DETAILS_BASE] == "*" {
-                    surface
-                } else {
-                    details[DETAILS_BASE].to_string()
-                };
-
-                let cat = details[DETAILS_CATEGORY].to_string();
-                let subcat = details[DETAILS_SUBCATEGORY1].to_string();
-
-                let word_cat = {
-                    let mut word_cat = WordCategory::Unknown;
-                    'outer: for (c, patterns) in &self.mapper {
-                        for pattern in patterns {
-                            if pattern.0 == cat && (pattern.1 == subcat || pattern.1 == "*") {
-                                word_cat = *c;
-                                break 'outer;
-                            }
-                        }
+                if !self.filter.filter(&word) {
+                    if blacklist.contains_key(&word.word) {
+                        blacklisted += 1;
+                        word.filter = true;
+                    } else if !self.dict.contains_word(&word) {
+                        tracing::debug!("No match {} [{:?}]", &word.word, &token.details());
+                        no_match += 1;
+                        word.filter = true;
                     }
-
-                    word_cat
-                };
-
-                if word_cat == WordCategory::Unknown {
-                    tracing::debug!(target: "Parser",
-                        "Category no found: {}: {}/{}", word, cat, subcat);
-                }
-
-                let mut word = Word::new(word, word_cat);
-
-                if blacklist.contains_key(&word.word) {
-                    word.filter = true;
                 }
 
                 word
             })
             .filter(|word| {
-                if self.dict.words.contains_key(&word.word) {
-                    self.filter.filter(word)
-                } else {
+                if self.filter.filter(word) {
+                    filtered += 1;
                     false
+                } else {
+                    true
                 }
             })
             .collect::<Vec<Word>>();
 
         let mut lex = Lexicon::new();
         lex.tokens = tokens.len();
+        lex.skipped = no_match;
+        lex.blacklisted = blacklisted;
+        lex.filtered = filtered;
 
         for word in words {
             for c in word.word.chars() {
-                if self.dict.kanji.contains_key(&c) {
+                if self.dict.contains_kanji(c) {
                     lex.add_kanji(c);
                 }
             }

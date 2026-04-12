@@ -3,13 +3,15 @@ use std::{
     path::Path,
 };
 
+use kanaria::string::UCSStr;
 use serde::Deserialize;
 use serde_json::Value;
+use unicode_normalization::UnicodeNormalization;
 
 use crate::{
     parsing::{
         ParseError,
-        dict::{Dict, DictKanji, DictWord},
+        dict::{Dict, DictWord},
     },
     util::load_data_file,
 };
@@ -89,43 +91,117 @@ pub struct JMDictLoader {
 }
 
 impl JMDictLoader {
+    pub fn new(word_file: impl AsRef<Path>) -> Result<Self, ParseError> {
+        let content = load_data_file(word_file)?;
+
+        Ok(serde_json::from_str(&content).unwrap())
+    }
+
+    fn get_base_forms(dict_word: &JMWord, kana: &JMKana) -> Vec<String> {
+        let mut result = vec![];
+
+        if kana.applies_to_kanji.is_empty() {
+            // kana only word
+            result.push(kana.text.clone());
+        } else if kana.applies_to_kanji.iter().any(|s| s == "*") {
+            if dict_word.kanji.is_empty() {
+                // kana only word
+                result.push(kana.text.clone());
+            } else {
+                // reading applies to all kanji
+                for kanji in &dict_word.kanji {
+                    if kanji.tags.iter().any(|s| s == "sK") {
+                        continue;
+                    }
+                    result.push(kanji.text.clone());
+                }
+            }
+        } else {
+            // reading applies to subset of kanji
+            for kanji in &kana.applies_to_kanji {
+                result.push(kanji.to_string());
+            }
+        }
+
+        result
+    }
+
+    fn get_senses<'a>(dict_word: &'a JMWord, base: &'a str, kana: &'a str) -> Vec<&'a JMSense> {
+        let mut senses = vec![];
+
+        for sense in &dict_word.sense {
+            if !sense.applies_to_kana.iter().any(|s| s == "*" || s == kana) {
+                continue;
+            }
+            if !sense.applies_to_kanji.iter().any(|s| s == "*" || s == base) {
+                continue;
+            }
+
+            senses.push(sense);
+        }
+
+        senses
+    }
+
+    fn get_pos(dict_word: &JMWord, base: &str, kana: &str) -> HashSet<String> {
+        let mut pos = HashSet::new();
+
+        let senses = Self::get_senses(dict_word, base, kana);
+
+        for sense in senses {
+            for s_pos in &sense.pos {
+                pos.insert(s_pos.to_owned());
+            }
+        }
+
+        pos
+    }
+
+    pub fn parse_dict_entry(dict_word: &JMWord) -> Vec<DictWord> {
+        let mut result = vec![];
+
+        for kana in &dict_word.kana {
+            if kana.tags.iter().any(|s| s == "sk") {
+                continue;
+            }
+
+            let reading = Self::normalize_reading(&kana.text);
+
+            let base_forms = Self::get_base_forms(dict_word, kana);
+
+            for base_form in base_forms {
+                let pos = Self::get_pos(dict_word, &base_form, &kana.text);
+
+                result.push(Dict::new_word(
+                    dict_word.id.clone(),
+                    base_form,
+                    reading.clone(),
+                    pos,
+                ));
+            }
+        }
+
+        result
+    }
+
     pub fn load(
         word_file: impl AsRef<Path>,
         kanji_file: impl AsRef<Path>,
     ) -> Result<Dict, ParseError> {
-        let content = load_data_file(word_file)?;
-
-        let jmdict: JMDictLoader = serde_json::from_str(&content).unwrap();
+        let jmdict = Self::new(word_file)?;
 
         tracing::info!("Loaded {} words", jmdict.words.len());
 
         let mut dict = Dict::new();
 
         for dict_word in jmdict.words {
-            let word = if dict_word.kanji.is_empty() {
-                dict_word.kana[0].text.clone()
-            } else {
-                dict_word.kanji[0].text.clone()
-            };
-
-            let mut pos = HashSet::new();
-
-            for sense in &dict_word.sense {
-                for s_pos in &sense.pos {
-                    pos.insert(s_pos.to_owned());
-                }
+            for entry in Self::parse_dict_entry(&dict_word) {
+                dict.add_word(entry);
             }
-            dict.words.insert(
-                word.clone(),
-                DictWord {
-                    word,
-                    pos: pos.into_iter().collect(),
-                },
-            );
         }
 
         for kanji in Self::load_kanji(kanji_file)? {
-            dict.kanji.insert(kanji, DictKanji { kanji });
+            dict.add_kanji(kanji);
         }
 
         Ok(dict)
@@ -144,5 +220,11 @@ impl JMDictLoader {
         }
 
         Ok(result)
+    }
+
+    fn normalize_reading(reading: &str) -> String {
+        let reading = reading.nfkc().collect::<String>();
+
+        UCSStr::from_str(&reading).katakana().to_string()
     }
 }

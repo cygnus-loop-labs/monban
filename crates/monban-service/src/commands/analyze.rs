@@ -16,7 +16,6 @@ pub fn cmd_get_blacklist(config: &Config) -> Result<Vec<Word>, ParseError> {
 pub fn cmd_analyze<F>(
     config: &Config,
     input: impl AsRef<Path>,
-    ty: InputType,
     on_progress: F,
 ) -> Result<Lexicon, ParseError>
 where
@@ -33,6 +32,16 @@ where
     progress = 10;
     on_progress(progress);
 
+    let ty = match input.as_ref().extension() {
+        Some(ext) => {
+            if ext == "epub" {
+                InputType::Epub
+            } else {
+                InputType::Txt
+            }
+        }
+        None => InputType::Txt,
+    };
     let mut lexicon = match ty {
         InputType::Txt => parser.load_text(input, &blacklist),
         InputType::Epub => parser.load_epub(input, &blacklist),

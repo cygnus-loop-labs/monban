@@ -8,6 +8,7 @@ default-run = "monban-cli"
 anyhow = { workspace = true }
 clap = { workspace = true }
 dirs = { workspace = true }
+lindera = { workspace = true }
 monban-core = { path = "../monban-core/" }
 monban-service = { path = "../monban-service/" }
 serde_json = { workspace = true }

@@ -8,6 +8,9 @@ pub struct Lexicon {
     pub words: IndexMap<String, Word>,
     pub kanji: IndexMap<char, Kanji>,
     pub tokens: usize,
+    pub filtered: usize,
+    pub blacklisted: usize,
+    pub skipped: usize,
 }
 
 impl Lexicon {
@@ -16,6 +19,9 @@ impl Lexicon {
             words: IndexMap::new(),
             kanji: IndexMap::new(),
             tokens: 0,
+            filtered: 0,
+            blacklisted: 0,
+            skipped: 0,
         }
     }
 

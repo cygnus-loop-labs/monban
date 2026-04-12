@@ -4,16 +4,16 @@ use monban_core::{Config, DictionaryItem, Lexicon};
 
 #[derive(Default, Serialize)]
 pub struct Stats {
-    words: Count,
-    kanji: Count,
+    pub words: Count,
+    pub kanji: Count,
 }
 
 #[derive(Default, Serialize)]
 pub struct Count {
-    count: u32,
-    unique_count: u32,
-    unknown_count: u32,
-    n1_n5_count: (u32, u32, u32, u32, u32),
+    pub count: u32,
+    pub unique_count: u32,
+    pub unknown_count: u32,
+    pub n1_n5_count: (u32, u32, u32, u32, u32),
 }
 
 impl Count {
@@ -59,7 +59,7 @@ impl WordAnalyzer {
 
     pub fn analyze(&self, lexicon: &Lexicon) -> Stats {
         Stats {
-            words: Count::new(lexicon.words.values()),
+            words: Count::new(lexicon.words.values().filter(|w| !w.filter)),
             kanji: Count::new(lexicon.kanji.values()),
         }
     }

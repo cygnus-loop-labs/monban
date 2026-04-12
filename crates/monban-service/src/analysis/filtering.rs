@@ -13,18 +13,18 @@ impl WordFilter {
 
     pub fn filter(&self, word: &Word) -> bool {
         if self.exclude_chars.contains(&word.word) {
-            return false;
+            return true;
         }
 
         if word.cat == WordCategory::Unknown {
-            return false;
+            return true;
         }
 
         if word.word.chars().all(|c| !c.is_alphabetic()) {
             tracing::debug!(target: "Parser", "Filtering non alpha words: {}", &word.word);
-            return false;
+            return true;
         }
 
-        true
+        false
     }
 }
