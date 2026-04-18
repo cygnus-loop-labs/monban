@@ -41,12 +41,13 @@ impl DeckLoader for JLPTDeckLoader {
         let entries: JLPTDeckFile = serde_json::from_str(&content)
             .map_err(|_| ParseError::InvalidFileFormat(name.clone()))?;
 
-        let mut deck = Deck::new();
+        let mut deck = Deck::new(&name);
 
         for entry in &entries.vocabulary {
             let deck_entry = deck.add_word(
                 entry.word.clone(),
                 entry.reading.clone(),
+                entry.meaning.clone(),
                 WordCategory::Unknown,
             );
             deck_entry.tag(format!("{}={:?}", &name, entry.level));

@@ -15,8 +15,17 @@ Verb = [["動詞", "自立"]]
 Adjective = [["形容詞", "*"], ["名詞", "形容動詞語幹"]]
 Misc = [["感動詞", "*"]]
 
-[decks]
-"jlpt" = { file="decks/jlpt.json", type="jlpt" }
+[[decks]]
+type = "jlpt"
+name = "jlpt"
+path ="decks/jlpt.json"
+
+[[decks]]
+type = "anki"
+name = "日本語::Kaishi 1.5k"
+word = "Word"
+reading = "Word Reading"
+meaning = "Word Meaning"
 
 [anki]
 url = "http://localhost:8765"

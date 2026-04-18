@@ -32,7 +32,7 @@ impl DeckLoader for WKDeckLoader {
 
         let entries: WKDeckFile = serde_json::from_str(&content).unwrap();
 
-        let mut deck = Deck::new();
+        let mut deck = Deck::new(&name);
 
         for entry in &entries.kanji {
             let mut kanji = Kanji::new(entry.characters.chars().next().unwrap());
@@ -45,6 +45,7 @@ impl DeckLoader for WKDeckLoader {
             let deck_entry = deck.add_word(
                 entry.characters.clone(),
                 entry.readings[0].clone(),
+                entry.meanings[0].clone(),
                 WordCategory::Unknown,
             );
             deck_entry.tag(format!("{}={}", &name, entry.level));

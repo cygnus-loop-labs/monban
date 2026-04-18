@@ -12,7 +12,7 @@ pub struct Config {
     pub data_dir: PathBuf,
     pub dictionary: DictionaryConfig,
     pub parser: ParserConfig,
-    pub decks: HashMap<String, DeckConfig>,
+    pub decks: Vec<DeckConfig>,
     pub anki: AnkiConfig,
 }
 
@@ -44,10 +44,26 @@ pub struct FilteringConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct DeckConfig {
-    pub file: String,
-    #[serde(rename = "type")]
-    pub ty: String,
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum DeckConfig {
+    Anki {
+        name: String,
+        word: String,
+        reading: String,
+        meaning: String,
+    },
+    File {
+        name: String,
+        path: String,
+    },
+    Jlpt {
+        name: String,
+        path: String,
+    },
+    Wk {
+        name: String,
+        path: String,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]

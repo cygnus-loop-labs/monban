@@ -1,8 +1,9 @@
 mod commands;
 
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use tauri::Manager;
+use tokio::sync::Mutex;
 
 use crate::commands::{AppState, analyze, get_blacklist};
 

@@ -8,6 +8,7 @@ use crate::{Kanji, Word, WordCategory};
 pub struct DeckEntry {
     pub word: String,
     pub reading: String,
+    pub meaning: String,
     pub cat: WordCategory,
     pub learned: bool,
     pub tags: HashSet<String>,
@@ -19,23 +20,37 @@ impl DeckEntry {
     }
 }
 
+#[derive(Debug)]
 pub struct Deck {
+    pub name: String,
     words: HashMap<String, DeckEntry>,
     kanji: HashMap<String, Kanji>,
 }
 
 impl Deck {
-    pub fn new() -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
+            name: name.to_string(),
             words: HashMap::new(),
             kanji: HashMap::new(),
         }
     }
 
-    pub fn add_word(&mut self, word: String, reading: String, cat: WordCategory) -> &mut DeckEntry {
+    pub fn words_len(&self) -> usize {
+        self.words.len()
+    }
+
+    pub fn add_word(
+        &mut self,
+        word: String,
+        reading: String,
+        meaning: String,
+        cat: WordCategory,
+    ) -> &mut DeckEntry {
         self.words.entry(word.clone()).or_insert(DeckEntry {
             word,
             reading,
+            meaning,
             cat,
             learned: false,
             tags: Default::default(),
@@ -51,11 +66,5 @@ impl Deck {
             word.learned |= e.learned;
             word.tags.extend(e.tags.iter().cloned());
         }
-    }
-}
-
-impl Default for Deck {
-    fn default() -> Self {
-        Self::new()
     }
 }

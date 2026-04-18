@@ -1,17 +1,47 @@
-use monban_core::Config;
+use monban_core::{Config, Deck};
 
-use crate::integration::anki::{AnkiClient, AnkiDeck, ConnectError};
+use crate::integration::anki::{AnkiClient, ConnectError, DeckStats, NoteModel};
 
-pub struct AnkiDeckLoader {}
+pub struct AnkiDeckLoader {
+    client: AnkiClient,
+}
 
 impl AnkiDeckLoader {
-    pub async fn list_decks(config: &Config) -> Result<Vec<AnkiDeck>, ConnectError> {
+    pub fn new(config: &Config) -> Self {
         let url = &config.anki.url;
-
         let client = AnkiClient::new(url);
 
-        tracing::info!("Status={:?}", client.get_status().await);
+        Self { client }
+    }
 
-        client.get_decks().await
+    pub async fn load(
+        name: String,
+        config: &Config,
+        word: &str,
+        reading: &str,
+        meaning: &str,
+    ) -> Result<Deck, ConnectError> {
+        let url = &config.anki.url;
+        let client = AnkiClient::new(url);
+
+        client.get_deck(&name, word, reading, meaning).await
+    }
+
+    pub async fn list_decks(&self) -> Result<Vec<DeckStats>, ConnectError> {
+        self.client.get_decks().await
+    }
+
+    pub async fn get_deck(
+        &self,
+        deck: &str,
+        word: &str,
+        reading: &str,
+        meaning: &str,
+    ) -> Result<Deck, ConnectError> {
+        self.client.get_deck(deck, word, reading, meaning).await
+    }
+
+    pub async fn get_models(&self) -> Result<Vec<NoteModel>, ConnectError> {
+        self.client.get_models().await
     }
 }

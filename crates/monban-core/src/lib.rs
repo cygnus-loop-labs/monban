@@ -4,7 +4,7 @@ mod kanji;
 mod lexicon;
 mod word;
 
-pub use config::Config;
+pub use config::{Config, DeckConfig};
 pub use deck::Deck;
 pub use kanji::Kanji;
 pub use lexicon::Lexicon;

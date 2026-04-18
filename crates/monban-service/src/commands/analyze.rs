@@ -1,9 +1,24 @@
 use std::path::Path;
 
-use crate::parsing::{
-    DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader, WKDeckLoader,
+use thiserror::Error;
+
+use monban_core::{Config, DeckConfig, Lexicon, Word};
+
+use crate::{
+    integration::anki::ConnectError,
+    parsing::{
+        DeckLoader as _, InputType, JLPTDeckLoader, ParseError, Parser, PlainDeckLoader,
+        WKDeckLoader, deck::AnkiDeckLoader,
+    },
 };
-use monban_core::{Config, Deck, Lexicon, Word};
+
+#[derive(Debug, Error)]
+pub enum AnalyzeError {
+    #[error("Parse error: {0}")]
+    ParseError(#[from] ParseError),
+    #[error("Connect error: {0}")]
+    ConnectError(#[from] ConnectError),
+}
 
 pub fn cmd_get_blacklist(config: &Config) -> Result<Vec<Word>, ParseError> {
     let parser = Parser::new(config)?;
@@ -13,11 +28,11 @@ pub fn cmd_get_blacklist(config: &Config) -> Result<Vec<Word>, ParseError> {
     Ok(blacklist.into_values().collect())
 }
 
-pub fn cmd_analyze<F>(
+pub async fn cmd_analyze<F>(
     config: &Config,
     input: impl AsRef<Path>,
     on_progress: F,
-) -> Result<Lexicon, ParseError>
+) -> Result<Lexicon, AnalyzeError>
 where
     F: Fn(u32),
 {
@@ -51,28 +66,39 @@ where
     on_progress(progress);
 
     let deck_list = &config.decks;
-    let n_decks = deck_list.keys().len();
+    let n_decks = deck_list.len();
 
     let deck_progress = 30 / n_decks;
 
-    let mut decks = deck_list
-        .iter()
-        .map(|(name, params)| {
-            progress += deck_progress as u32;
-            on_progress(progress);
-            match params.ty.as_str() {
-                "plain" => PlainDeckLoader::load(name.to_string(), &params.file, config),
-                "wk" => WKDeckLoader::load(name.to_string(), &params.file, config),
-                "jlpt" => JLPTDeckLoader::load(name.to_string(), &params.file, config),
-                _ => unimplemented!(),
+    let mut decks = vec![];
+
+    for deck in deck_list {
+        progress += deck_progress as u32;
+        on_progress(progress);
+        let deck = match deck {
+            DeckConfig::Anki {
+                name,
+                word,
+                reading,
+                meaning,
+            } => AnkiDeckLoader::load(name.to_string(), config, word, reading, meaning).await?,
+            DeckConfig::File { name, path } => {
+                PlainDeckLoader::load(name.to_string(), path, config)?
             }
-        })
-        .collect::<Result<Vec<Deck>, ParseError>>()?;
+            DeckConfig::Jlpt { name, path } => {
+                JLPTDeckLoader::load(name.to_string(), path, config)?
+            }
+            DeckConfig::Wk { name, path } => WKDeckLoader::load(name.to_string(), path, config)?,
+        };
+
+        decks.push(deck);
+    }
 
     progress = 60;
     on_progress(progress);
 
     for deck in decks.iter_mut() {
+        tracing::info!("Checking {}", &deck.name);
         progress += deck_progress as u32;
         on_progress(progress);
         for word in lexicon.iter_mut() {
